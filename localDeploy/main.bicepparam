@@ -2,7 +2,7 @@ using 'main.bicep'
 
 // Use the following to set the token:
 // export GITHUB_TOKEN=$(gh auth token)
-param githubToken = readEnvironmentVariable('GITHUB_TOKEN')
+param githubToken = readEnvironmentVariable('GITHUB_TOKEN', '')
 
 param owner = 'tulpy'
 param repoName = 'adventCalendar-2025'

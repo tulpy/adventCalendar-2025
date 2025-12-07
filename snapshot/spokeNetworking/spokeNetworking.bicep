@@ -5,7 +5,7 @@ metadata description = 'Spoke Networking - Azure Extended Zone deployment.'
 metadata version = '1.0.0'
 metadata author = 'Insight APAC Platform Engineering'
 
-@description('Optional. The Azure Region to deploy the resources into.')
+@description('Required. The Azure Region to deploy the resources into.')
 param location string = resourceGroup().location
 
 @description('Required. Extended location for the resource.')

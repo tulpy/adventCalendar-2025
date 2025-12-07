@@ -118,5 +118,29 @@
         }
       }
     }
+  },
+  "moduleAliases": {
+    "br": {
+      "public": {
+        "registry": "tulpybicep.azurecr.io",
+        "modulePath": ".."
+      }
+    }
+  },
+  "cloud": {
+    "credentialPrecedence": ["AzureCLI"],
+    "currentProfile": "AzureCloud"
+  },
+  "extensions": {
+    "microsoftGraphV1": "br:mcr.microsoft.com/bicep/extensions/microsoftgraph/v1.0:1.0.0",
+    "github": "br:bicepextdemo.azurecr.io/extensions/github:0.1.10"
+  },
+  "implicitExtensions": [],
+  "experimentalFeaturesEnabled": {
+    "deployCommands": false,
+    "testFramework": false,
+    "assertions": false,
+    "extendableParamFiles": false,
+    "localDeploy": false
   }
 }
