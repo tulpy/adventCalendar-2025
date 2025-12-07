@@ -1,0 +1,238 @@
+{
+  "predictedResources": [
+    {
+      "id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/networkSecurityGroups/nsgadds', subscription().subscriptionId, resourceGroup().name)]",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "nsgadds",
+      "apiVersion": "2023-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "environment": "idam",
+        "applicationName": "AEZ Platform Identity Landing Zone",
+        "owner": "Platform Team",
+        "criticality": "Tier0",
+        "costCenter": "1234",
+        "contactEmail": "test@test.com",
+        "dataClassification": "Internal",
+        "iac": "Bicep"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "INBOUND-FROM-onPremisesADDS-TO-subnet-PORT-adServices-PROT-any-ALLOW",
+            "properties": {
+              "access": "Allow",
+              "description": "Inbound rules from on-premises & Azure Corp ADDS servers to the subnet for the required ports and protocols",
+              "destinationAddressPrefix": "10.52.4.0/25",
+              "destinationAddressPrefixes": [],
+              "destinationApplicationSecurityGroups": [],
+              "destinationPortRange": "",
+              "destinationPortRanges": [
+                "53",
+                "88",
+                "123",
+                "135",
+                "137-139",
+                "389",
+                "445",
+                "464",
+                "636",
+                "3268",
+                "3269",
+                "5722",
+                "9389",
+                "49152-65535"
+              ],
+              "direction": "Inbound",
+              "priority": 500,
+              "protocol": "*",
+              "sourceAddressPrefix": "",
+              "sourceAddressPrefixes": [
+                "10.20.11.47",
+                "10.20.11.48"
+              ],
+              "sourceApplicationSecurityGroups": [],
+              "sourcePortRange": "*",
+              "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "INBOUND-FROM-onPremisesCorpNetworks-TO-adds-PORT-aadServices-PROT-any-ALLOW",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow on-premises corp virtual networks traffic to adds subnet on adservices ports",
+              "destinationAddressPrefix": "10.52.4.0/25",
+              "destinationAddressPrefixes": [],
+              "destinationApplicationSecurityGroups": [],
+              "destinationPortRange": "",
+              "destinationPortRanges": [
+                "53",
+                "88",
+                "123",
+                "135",
+                "137-139",
+                "389",
+                "445",
+                "464",
+                "636",
+                "3268",
+                "3269",
+                "5722",
+                "9389",
+                "49152-65535"
+              ],
+              "direction": "Inbound",
+              "priority": 501,
+              "protocol": "*",
+              "sourceAddressPrefix": "",
+              "sourceAddressPrefixes": [
+                "10.20.76.0/24"
+              ],
+              "sourceApplicationSecurityGroups": [],
+              "sourcePortRange": "*",
+              "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "INBOUND-FROM-azureSupernet-TO-adds-PORT-aadServices-PROT-any-ALLOW",
+            "properties": {
+              "access": "Allow",
+              "description": "Inbound rules from Azure Supernet to the ADDS subnet for the required ports and protocols",
+              "destinationAddressPrefix": "10.52.4.0/25",
+              "destinationAddressPrefixes": [],
+              "destinationApplicationSecurityGroups": [],
+              "destinationPortRange": "",
+              "destinationPortRanges": [
+                "53",
+                "88",
+                "123",
+                "135",
+                "137-139",
+                "389",
+                "445",
+                "464",
+                "636",
+                "3268",
+                "3269",
+                "5722",
+                "9389",
+                "49152-65535"
+              ],
+              "direction": "Inbound",
+              "priority": 502,
+              "protocol": "*",
+              "sourceAddressPrefix": "",
+              "sourceAddressPrefixes": [
+                "10.52.0.0/16"
+              ],
+              "sourceApplicationSecurityGroups": [],
+              "sourcePortRange": "*",
+              "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "INBOUND-FROM-RemoteAccessNetwork-TO-azurePlatDCs-PORT-22-3389-PROT-any-ALLOW",
+            "properties": {
+              "access": "Allow",
+              "description": "Inbound rule from allowed networks to Azure allowed network to azure Platform Domain Controllers on port 22, 3389 and any protocol",
+              "destinationAddressPrefix": "10.52.4.0/25",
+              "destinationAddressPrefixes": [],
+              "destinationApplicationSecurityGroups": [],
+              "destinationPortRange": "",
+              "destinationPortRanges": [
+                "3389",
+                "22"
+              ],
+              "direction": "Inbound",
+              "priority": 503,
+              "protocol": "*",
+              "sourceAddressPrefix": "",
+              "sourceAddressPrefixes": [
+                "10.20.72.4"
+              ],
+              "sourceApplicationSecurityGroups": [],
+              "sourcePortRange": "*",
+              "sourcePortRanges": []
+            }
+          },
+          {
+            "name": "INBOUND-FROM-subnet-TO-subnet-PORT-any-PROT-any-ALLOW",
+            "properties": {
+              "access": "Allow",
+              "description": "Inbound rule from the subnet to the subnet on any port and any protocol",
+              "destinationAddressPrefix": "10.52.4.0/25",
+              "destinationAddressPrefixes": [],
+              "destinationApplicationSecurityGroups": [],
+              "destinationPortRange": "*",
+              "destinationPortRanges": [],
+              "direction": "Inbound",
+              "priority": 999,
+              "protocol": "*",
+              "sourceAddressPrefix": "10.52.4.0/25",
+              "sourceAddressPrefixes": [],
+              "sourceApplicationSecurityGroups": [],
+              "sourcePortRange": "*",
+              "sourcePortRanges": []
+            }
+          }
+        ],
+        "flushConnection": false
+      }
+    },
+    {
+      "id": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/vnt10.52.1.0_24', subscription().subscriptionId, resourceGroup().name)]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "vnt10.52.1.0_24",
+      "apiVersion": "2024-05-01",
+      "location": "[resourceGroup().location]",
+      "extendedLocation": {
+        "name": "perth",
+        "type": "EdgeZone"
+      },
+      "tags": {
+        "environment": "idam",
+        "applicationName": "AEZ Platform Identity Landing Zone",
+        "owner": "Platform Team",
+        "criticality": "Tier0",
+        "costCenter": "1234",
+        "contactEmail": "test@test.com",
+        "dataClassification": "Internal",
+        "iac": "Bicep"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.52.1.0/24"
+          ]
+        },
+        "ddosProtectionPlan": null,
+        "dhcpOptions": {
+          "dnsServers": [
+            "10.52.0.1",
+            "10.52.0.2"
+          ]
+        },
+        "enableDdosProtection": false,
+        "subnets": [
+          {
+            "name": "adds",
+            "properties": {
+              "addressPrefix": "10.52.1.0/26",
+              "addressPrefixes": null,
+              "delegations": [],
+              "networkSecurityGroup": {
+                "id": "/providers/Microsoft.Network/networkSecurityGroups/nsgadds"
+              },
+              "routeTable": null,
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "serviceEndpoints": [],
+              "serviceEndpointPolicies": []
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "diagnostics": []
+}
