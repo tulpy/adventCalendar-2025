@@ -99,7 +99,7 @@ param azFirewallTier string = 'Standard'
   'Deny'
   'Off'
 ])
-param azFirewallIntelMode string = 'Alert'
+param azFirewallIntelMode string = 'Deny'
 
 @description('Optional. List of Custom Public IPs, which are assigned to firewalls ipConfigurations.')
 param azFirewallCustomPublicIps array = []
