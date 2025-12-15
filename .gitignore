@@ -1,0 +1,50 @@
+
+# Private JSON config file
+*.private.json
+*.private.jsonc
+
+# Locally built bicep files
+.local/build
+.local/build/*.json
+src/orchestration/build
+src/orchestration/build/*.json
+
+# Locally modified drawio diagrams
+docs/diagrams/modified
+
+# Visual Studio Solution
+.vs
+cert.pfx
+bin
+obj
+
+# Locally testing bicep orchestration files
+src/orchestration/temp
+src/orchestration/temp/*
+
+# Locally testing configuration files
+src/configuration/temp
+src/configuration/temp/*
+
+# Locally documentation building files
+src/**/temp/
+
+# Root-level temp directory
+temp/
+temp/*
+
+# Visio Diagrams when open
+*.~vsdx
+
+# Word Documents when open
+~$*.docx
+
+# Insight documentation generated
+Insight-**.docx
+
+# EPAC Output folder
+.Output
+
+# Mac Users
+TEMP
+.DS_Store

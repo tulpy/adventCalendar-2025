@@ -1,0 +1,5 @@
+# Application Landing Zone Subscriptions
+## Subscription Vending - Production
+deploy_Subscription_Vending_Prd:
+  templateFile: ./src/orchestration/subscriptionVending/subscriptionVending-prd.bicep
+  templateParameterFile: ./src/configuration/lz/subscriptionVending-prd.bicepparam
