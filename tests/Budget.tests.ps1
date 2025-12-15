@@ -1,7 +1,7 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 Param (
-    [string[]] $BicepParams = @("src/configuration/platform/platformIdentity-per.bicepparam"),
-    [string] $FolderPath = "src/configuration/lz"
+    [string[]] $BicepParams = @(""),
+    [string] $FolderPath = ""
 )
 
 #Requires -Version 7.0.0
