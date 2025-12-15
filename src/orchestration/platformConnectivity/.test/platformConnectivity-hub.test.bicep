@@ -14,6 +14,7 @@ module testDeployment '../platformConnectivity-hub.bicep' = {
     lzId: lzId
     envId: envId
     subscriptionId: subscriptionId
+    azFirewallIntelMode: 'Deny'
     tags: {
       environment: envId
       applicationName: 'Platform Connectivity Landing Zone'
