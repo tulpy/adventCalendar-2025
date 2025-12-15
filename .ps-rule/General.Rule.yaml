@@ -1,0 +1,158 @@
+# Name: Generic Rules
+# Description: A collection of generic suppression group rules that remove documented and known false-positives in the PSRule.Rules.Azure PowerShell module. For example, suppress rules around tagging of resources in Azure that don't appropriately support tagging.
+
+---
+# Synopsis: Suppress tagging requirement rule for non suitable resources. This suppression group rule works to reduce the number of false-positive failures reported from PSRule.Rules.Azure for resources that should not be validated against.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: 'Suppress-Azure.Resource.UseTags'
+  description: 'Suppress tagging requirement rule for non suitable resources. This suppression group rule works to reduce the number of false-positive failures reported from PSRule.Rules.Azure for resources that should not be validated against.'
+spec:
+  rule:
+    - Azure.Resource.UseTags
+  if:
+    type: '.'
+    in:
+      - Microsoft.OperationsManagement/solutions
+      - Microsoft.ManagedServices/registrationDefinitions
+      - Microsoft.ManagedServices/registrationAssignments
+      - Microsoft.Management/managementGroups
+      - Microsoft.Resources/resourceGroups
+      - Microsoft.Network/networkWatchers
+      - Microsoft.PolicyInsights/remediations
+      - Microsoft.KubernetesConfiguration/fluxConfigurations
+      - Microsoft.KubernetesConfiguration/extensions
+      - Microsoft.Sql/managedInstances
+      - Microsoft.Network/privateDnsZones
+      - Microsoft.Authorization/policyAssignments
+      - Microsoft.Authorization/policyDefinitions
+      - Microsoft.Authorization/policyExemptions
+      - Microsoft.Authorization/policySetDefinitions
+      - Microsoft.Authorization/locks
+      - Microsoft.AAD/DomainServices/oucontainer
+      - Microsoft.ApiManagement/service/eventGridFilters
+      - Microsoft.EventGrid/eventSubscriptions
+      - Microsoft.Automation/automationAccounts/softwareUpdateConfigurations
+
+---
+# Synopsis: Ignore Azure VM Maintenance Configuration which is only supported for isolated VM types - https://learn.microsoft.com/en-us/azure/virtual-machines/isolation.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Suppress-Azure.VM.MaintenanceConfig
+  description: 'AZR-000375 - Ignore Azure VM Maintenance Configuration which is only supported for isolated VM types - https://learn.microsoft.com/en-us/azure/virtual-machines/isolation.'
+spec:
+  rule:
+    - Azure.VM.MaintenanceConfig
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Compute/virtualMachines'
+
+---
+# Synopsis: Suppress audit diagnostics logs for Azure Key Vault as these are covered by DINE policies in ALZ.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: 'Suppress-Azure.KeyVault.Logs'
+  description: 'AZR-000119 - Suppress audit diagnostics logs are enabled to audit Key Vault access.'
+spec:
+  rule:
+    - Azure.KeyVault.Logs
+  if:
+    type: '.'
+    in:
+      - 'Microsoft.KeyVault/vaults'
+
+---
+# Synopsis: Suppress dependency requirement rule for non suitable resources. This suppression group rule works to reduce the number of false-positive failures reported from PSRule.Rules.Azure for resources that should not be validated against.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: 'SuppressDependency'
+  description: 'Suppress minimum version requirement rule for non suitable resources. This suppression group rule works to reduce the number of false-positive failures reported from PSRule.Rules.Azure for resources that should not be validated against.'
+spec:
+  if:
+    name: '.'
+    startsWith:
+      - 'dep'
+      - 'ms.'
+      - 'privatelink.'
+
+---
+# Synopsis: Ignore NSG lateral movement rule for Azure Bastion as this is needed for Bastion to work.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: 'SuppressNSGLateralWhenBastionIncluded'
+  description: 'Ignore NSG lateral movement rule for Azure Bastion as this is needed for Bastion to work.'
+spec:
+  rule:
+    - Azure.NSG.LateralTraversal
+  if:
+    allOf:
+      - name: '.'
+        contains: bastion
+      - type: '.'
+        in:
+          - Microsoft.Network/networkSecurityGroups
+---
+# Synopsis: Ignore availability zones for Azure Bastion public IP which is not supported. https://github.com/Azure/PSRule.Rules.Azure/issues/1442
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: ALZ.PublicIPForBastion
+spec:
+  rule:
+    - Azure.PublicIP.AvailabilityZone
+  if:
+    allOf:
+      - name: '.'
+        contains: bastion
+      - type: '.'
+        in:
+          - Microsoft.Network/publicIPAddresses
+
+---
+# Synopsis: Ignore automation account audit diagnostic logs are enabled as these are covered by DINE policies in ALZ
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: ALZ.DiagLogForAutomation
+spec:
+  rule:
+    - Azure.Automation.AuditLogs
+    - Azure.Automation.PlatformLogs
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - Microsoft.Automation/automationAccounts
+
+---
+# Synopsis: Ignore the minimum sample configuration.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: ALZ.MinimumSample
+spec:
+  rule:
+    - Azure.Firewall.Mode
+    - Azure.VNG.VPNAvailabilityZoneSKU
+    - Azure.PublicIP.AvailabilityZone
+    - Azure.VNG.VPNActiveActive
+    - Azure.PublicIP.StandardSKU
+    - Azure.VNET.UseNSGs
+  if:
+    anyOf:
+      - type: '.'
+        in:
+          - Microsoft.Network/azureFirewalls
+          - Microsoft.Network/publicIPAddresses
+          - Microsoft.Network/virtualNetworks
+          - Microsoft.Network/virtualNetworkGateways
+      - source: 'Template'
+        endsWith:
+          - '.bicep'

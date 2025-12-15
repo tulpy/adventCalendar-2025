@@ -1,0 +1,378 @@
+# Name: Insight Platform Landing Zone Rules
+# Description: A collection of rules and suppression group rules that support the use of the `/src/` Bicep files that have been purposefully created to be more modular in design than the Microsoft Cloud Adoption Framework (CAF) and Microsoft Well Architected Review (WAR) standards support for the Platform Landing Zone. These rules should be updated or reviewed whenever changes are made to these files.
+
+## Azure Storage
+---
+# Synopsis: Suppression for Azure.Storage.UseReplication for Azure Storage Accounts
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Suppress-Azure.Storage.UseReplication
+  description: 'AZR-000195 - Suppress rules for data replication using Globally Redundant Storage (GRS) for data residency reasons. E.g. Avoid data being securely replicated outside of Australia.'
+spec:
+  rule:
+    - Azure.Storage.UseReplication
+  if:
+    type: '.'
+    in:
+      - 'Microsoft.Storage/storageAccounts'
+
+## Azure Virtual Machines
+---
+# Synopsis: Suppression for Azure.VM.AMA for Virtual Machines
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Suppress-Azure.VM.AMA
+  description: 'AZR-000345 - Virtual Machines will not have Azure Monitor Agent (AMA) installed by default as they are controlled by the centralised Azure Monitor Agent (AMA) deployment.'
+spec:
+  rule:
+    - Azure.VM.AMA
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Compute/virtualMachines'
+
+## Azure Log Analytics
+---
+# Synopsis: Suppression for Azure.Log.Replication for Log Analytics Workspace.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Suppress-Azure.Log.Replication.Parameter
+  description: 'AZR-000425 - Suppress Log Analytics workspace if not replicated to a secondary region.'
+spec:
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.OperationalInsights/workspaces'
+      - source: 'Template'
+        withinPath:
+          - 'src/orchestration/'
+  rule:
+    - Azure.Log.Replication
+
+
+---
+# Synopsis: Suppression for Azure.Log.Replication for Platform Management Log Analytics - Parameter
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressAzureLogReplicationForPlatformManagementParameter
+  description: 'Platform Management Log Analytics workspace is not replicated to a secondary region as part of the platform design.'
+spec:
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.OperationalInsights/workspaces'
+      - source: 'Parameter'
+        withinPath:
+          - 'src/configuration/platform'
+  rule:
+    - Azure.Log.Replication
+
+## Azure Networking
+---
+# Synopsis: Ignore Azure VNG Maintenance Configuration.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Suppress-Azure.VNG.MaintenanceConfig
+  description: 'AZR-000430 - Ignore Azure VNG Maintenance Configuration.'
+spec:
+  rule:
+    - Azure.VNG.MaintenanceConfig
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Network/virtualNetworkGateways'
+
+---
+# Synopsis: Suppression for Azure.VNG.ERAvailabilityZoneSKU for Perth Extended Zone as it doesn't support Availability Zone SKU.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Azure.VNG.ERAvailabilityZoneSKU
+  description: 'AZR-000273: Consider deploying ExpressRoute gateways with an availability zone SKU to improve reliability of virtual network gateways.'
+spec:
+  rule:
+    - Azure.VNG.ERAvailabilityZoneSKU
+  if:
+    field: tags.extendedZone
+    equals: true
+
+---
+# Synopsis: Suppression for Azure.VNET.BastionSubnet for Perth Extended Zone as it doesn't support Azure Bastion.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Azure.VNET.BastionSubnet
+  description: 'AZR-000314: Consider an Azure Bastion Subnet to allow for out of band remote access to VMs and provide an extra layer of control.'
+spec:
+  rule:
+    - Azure.VNET.BastionSubnet
+  if:
+    field: tags.extendedZone
+    equals: true
+
+---
+# Synopsis: Ignore automation account audit diagnostic logs are enabled on logging.bicep
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Insight.DiagLogForAutomation.Automation
+spec:
+  rule:
+    - Azure.Automation.AuditLogs
+    - Azure.Automation.PlatformLogs
+  if:
+    allOf:
+      - source: 'Template'
+        endsWith:
+          - 'logging.bicep'
+
+---
+# Synopsis: Ignore Network Security Group traversal rule as security rules in this template are dynamically created in array loop.
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: Insight.NetworkSecurityGroup.LateralTraversal.Ignore
+  description: 'Ignore Network Security Group traversal rule as security rules in this template are dynamically created in array loop.'
+spec:
+  rule:
+    - Azure.NSG.LateralTraversal
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Network/networkSecurityGroups'
+
+---
+# Synopsis: Suppression for Azure.Automation.PlatformLogs
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressAutomationPlatformLogs
+  description: 'AZR-000089: Consider configuring diagnostic settings to capture platform logs from Automation accounts.'
+spec:
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Automation/automationAccounts'
+      - source: 'Template'
+        withinPath:
+          - 'src/modules'
+  rule:
+    - Azure.Automation.PlatformLogs
+
+---
+# Synopsis: Suppression for Azure.Deployment.AdminUsername
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressDeploymentAdminUsername
+  description: 'Ref AZR-000284: Sensitive properties should be passed as parameters. Avoid using deterministic values for sensitive properties.'
+spec:
+  if:
+    allOf:
+      - source: 'Template'
+        withinPath:
+          - 'src/modules'
+  rule:
+    - Azure.Deployment.AdminUsername
+
+---
+# Synopsis: Suppression for Azure.Resource.UseTags for Deployments
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressResourceUseTagsForDeployments
+  description: 'Ref AZR-000166: Consider tagging resources using a standard convention. Identify mandatory and optional tags then tag all resources and resource groups using this standard.'
+spec:
+  if:
+    allOf:
+      - source: 'Template'
+        withinPath:
+          - 'src/modules'
+  rule:
+    - Azure.Resource.UseTags
+
+---
+# Synopsis: Suppression for Azure.Deployment.AdminUsername for WAF-Aligned Tests
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressDeploymentAdminUsernameWAFAligned
+  description: 'Ref AZR-000284: Sensitive properties should be passed as parameters. Avoid using deterministic values for sensitive properties.'
+spec:
+  if:
+    allOf:
+      - source: 'Template'
+        withinPath:
+          - 'src/modules'
+  rule:
+    - Azure.Deployment.AdminUsername
+
+---
+# Synopsis: Suppression for Azure.VM.AMA for Virtual Machines
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressAzureVmAmaForVirtualMachines
+  description: 'Deployment of Azure Monitor Agent (AMA) is managed through Azure Policy.'
+spec:
+  rule:
+    - Azure.VM.AMA
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Compute/virtualMachines'
+
+---
+# Synopsis: Suppression for Azure.VM.MaintenanceConfig for Virtual Machines
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressAzureVmMaintenanceConfigForVirtualMachines
+  description: 'The maintenance configuration is managed through either Azure Update Manager or other tools.'
+spec:
+  rule:
+    - Azure.VM.MaintenanceConfig
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Compute/virtualMachines'
+
+---
+# Synopsis: Suppression for Azure.VNET.SubnetNaming for Platform Subnets
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressResourceAzureVNETSubnetNaming
+  description: 'Virtual Network subnets names will be derived based on the CAF Naming standards.'
+spec:
+  rule:
+    - Azure.VNET.SubnetNaming
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Network/virtualNetworks'
+      - field: properties.subnets[*]
+        anyOf:
+          - field: name
+            hasValue: true
+
+---
+# Synopsis: Suppression for Azure.KeyVault.Firewall for Application Gateway
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressResourceAzureKeyVaultFirewall
+  description: 'Azure Key Vault network policies will be imposed through Azure Policy and will be denied by default.'
+spec:
+  rule:
+    - Azure.KeyVault.Firewall
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.KeyVault/vaults'
+
+---
+# Synopsis: Suppression for Azure.VM.DiskCaching for Virtual Machines
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressAzureVmDiskCachingForVirtualMachines
+  description: 'Disk caching is configured correctly at the workload.'
+spec:
+  rule:
+    - Azure.VM.DiskCaching
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Compute/virtualMachines'
+
+---
+# Synopsis: Suppression for Azure.VNET.SingleDNS for Platform Virtual Networks
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressResourceAzureVNETSingleDNS
+  description: 'Platform Virtual Networks will be pointed to the Azure Firewall Private IP which addresses redundancy'
+spec:
+  rule:
+    - Azure.VNET.SingleDNS
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Network/virtualNetworks'
+      - field: properties.dhcpOptions
+        anyOf:
+          - field: dnsServers
+            hasValue: true
+
+---
+# Synopsis: Suppression for Azure.KeyVault.RBAC for Azure Firewall Key Vault
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressResourceAzureKeyVaultRBAC
+  description: 'Azure Key Vault RBAC permission model will not be used by Azure Firewall to manage access to the Key Vault due to Firewall limitation.'
+spec:
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.KeyVault/vaults'
+      - field: tags.Purpose
+        equals: 'TLS Certificate reference for Azure Firewall Policy'
+  rule:
+    - Azure.KeyVault.RBAC
+
+---
+# Synopsis: Suppression for Azure.VNET.PrivateSubnet for Platform Virtual Networks
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressResourceAzurePrivateSubnet
+  description: 'Virtual Networks will be allow subnet outbound access by default as they are controlled by the centralised Azure Firewall.'
+spec:
+  rule:
+    - Azure.VNET.PrivateSubnet
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.Network/virtualNetworks'
+
+---
+# Synopsis: Suppression for Azure.Log.Replication for Platform Management Log Analytics
+apiVersion: github.com/microsoft/PSRule/v1
+kind: SuppressionGroup
+metadata:
+  name: SuppressAzureLogReplicationForPlatformManagement
+  description: 'Platform Management Log Analytics workspace is not replicated to a secondary region as part of the platform design.'
+spec:
+  if:
+    allOf:
+      - type: '.'
+        in:
+          - 'Microsoft.OperationalInsights/workspaces'
+      - source: 'Template'
+        withinPath:
+          - 'src/modules'
+  rule:
+    - Azure.Log.Replication
+
+

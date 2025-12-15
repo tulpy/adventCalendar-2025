@@ -1,0 +1,266 @@
+name: 'Repository Management'
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 8 * * 1-5'
+
+  workflow_dispatch: {}
+
+concurrency:
+  group: repository-management
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  statuses: write
+  packages: write
+  id-token: write
+
+jobs:
+  # This job is used to update the repository's wiki.
+  publish-wiki:
+    name: 'Publish wiki'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Install Deno
+        run: |
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "$HOME/.deno/bin" >> $GITHUB_PATH
+
+      - name: Flatten structure of docs/wiki for GitHub Wiki
+        run: |
+          echo "Flattening docs/wiki structure links for GitHub Wiki..."
+          find docs/wiki -type f -iname "*.md" -print0 | while IFS= read -r -d '' f; do
+
+            grep -nEo '\(\.\./[A-Za-z0-9_-]+/[^)]+\.md\)' "$f" | while IFS=: read -r lineno link; do
+              folder=$(echo "$link" | sed -E 's/.*\(\.\.\/([A-Za-z0-9_-]+)\/.*/\1/')
+              target=$(echo "$link" | sed -E 's/.*\(\.\.\/[A-Za-z0-9_-]+\/([^)]+)\)/\1/')
+              if ! echo "$target" | grep -qi "^${folder}-"; then
+                echo "⚠️  Warning in $f:$lineno - suspicious link: $link"
+              fi
+            done
+
+            grep -nEo '\((\.{0,2}/)?([A-Za-z0-9_-]+)/\2[^)]*\.md\)' "$f" | sort -u > /tmp/matches || true
+            if [ -s /tmp/matches ]; then
+              echo "File: $f"
+              while IFS=: read -r lineno match; do
+                # Remove .md from the link
+                new=$(echo "$match" | sed -E 's#(\((\.{0,2}/)?([A-Za-z0-9_-]+)/\3[^)]*)\.md\)#\1#gI')
+                echo "  Line $lineno: $match -> $new"
+              done < /tmp/matches
+
+              # Only replace if NOT starting with http://, https://, or mailto:
+              sed -E -i '
+              s#\((\.{0,2}/)?([A-Za-z0-9_-]+)/\2([^)]*)\.md\)#(\1\2\3)#gI
+              ' "$f"
+            fi
+          done
+
+      - name: Sync to GitHub Wiki
+        uses: Andrew-Chen-Wang/github-wiki-action@v5.0.3
+        with:
+          path: ./docs/wiki
+
+  # This job is used to update and close out stale pull requests.
+  stale-pr:
+    name: 'Stale pull requests'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Mark Stale Pull Requests
+        uses: actions/stale@v10
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-pr-stale: 30
+          days-before-pr-close: 365
+          stale-pr-label: inactive
+          close-pr-label: auto-close
+          exempt-pr-labels: keep-open
+          stale-pr-message: >
+            This pull request has been inactive for 14 days.
+            If you are finished with your changes, don't forget to get your PR reviewed and merged.
+          close-pr-message: >
+            This pull request has been inactive for 30 days. At this time, we are closing the PR.
+            If you decide to continue working on your change, you can reopen the PR and continue working. Thank you!
+
+  labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Create issue on manual change
+        if: ${{ github.event_name == 'label' && !contains(github.actor, '[bot]') }}
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const { default: script } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/label_issue.mjs`)
+            await script({context, github, core})
+
+      - name: Run Labeler
+        if: ${{ !contains(github.actor, '[bot]') }}
+        uses: crazy-max/ghaction-github-labeler@v5.3.0
+        with:
+          github-token: ${{ github.token }}
+          dry-run: ${{ github.event_name == 'pull_request' }}
+
+  tag-and-release:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Get latest PR merged
+        id: pr
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 1
+            });
+            const pr = prs.data.find(pr => pr.merged_at && pr.merge_commit_sha === context.sha);
+            if (!pr) throw new Error('No merged PR found for this commit.');
+            core.setOutput('pr_number', pr.number);
+            core.setOutput('pr_title', pr.title);
+            core.setOutput('pr_body', pr.body);
+
+      - name: Check for major release trigger
+        id: major_trigger
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const prNumber = Number(process.env.PR_NUMBER || '${{ steps.pr.outputs.pr_number }}');
+            let isMajor = false;
+            if (prNumber) {
+              const pr = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              const labels = pr.data.labels.map(l => l.name.toLowerCase());
+              if (labels.includes('major-release')) isMajor = true;
+              if (pr.data.title.includes('[major]') || (pr.data.body && pr.data.body.includes('[major]'))) isMajor = true;
+            } else {
+              // Fallback: check commit message
+              const commit = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.sha
+              });
+              if (commit.data.commit.message.includes('[major]')) isMajor = true;
+            }
+            core.setOutput('major', isMajor ? 'true' : 'false');
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          git fetch --tags
+          latest_tag=$(git tag --sort=-v:refname | head -n 1)
+          echo "latest_tag=$latest_tag" >> $GITHUB_OUTPUT
+
+      - name: Bump version and create tag
+        id: bump_tag
+        run: |
+          latest_tag=${{ steps.get_tag.outputs.latest_tag }}
+          is_major=${{ steps.major_trigger.outputs.major }}
+          if [[ -z "$latest_tag" ]]; then
+            new_tag="v1.0.0"
+          else
+            IFS='.' read -r major minor patch <<< "${latest_tag#v}"
+            if [[ "$is_major" == "true" ]]; then
+              new_tag="v$((major+1)).0.0"
+            else
+              new_tag="v$major.$minor.$((patch+1))"
+            fi
+          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "$new_tag"
+          git push origin "$new_tag"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+      - name: Check if major version
+        id: is_major
+        run: |
+          tag=${{ steps.bump_tag.outputs.new_tag }}
+          major=$(echo $tag | cut -d'.' -f1 | tr -d 'v')
+          minor=$(echo $tag | cut -d'.' -f2)
+          patch=$(echo $tag | cut -d'.' -f3)
+          if [[ "$minor" == "0" && "$patch" == "0" ]]; then
+            echo "major=true" >> $GITHUB_OUTPUT
+          else
+            echo "major=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate release notes
+        id: release_notes
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const tag = '${{ steps.bump_tag.outputs.new_tag }}';
+            const latestTag = '${{ steps.get_tag.outputs.latest_tag }}';
+
+            // Use GitHub's automatic release notes generation API
+            const response = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              previous_tag_name: latestTag || undefined, // Use previous tag if available
+              target_commitish: 'main'
+            });
+
+            // Determine release type based on version number analysis
+            const major = tag.split('.')[0].replace('v', '');
+            const minor = tag.split('.')[1];
+            const patch = tag.split('.')[2];
+
+            let releaseType;
+            if (minor === '0' && patch === '0') {
+              releaseType = "🚀 Major Release";
+            } else if (patch === '0') {
+              releaseType = "✨ Minor Release";
+            } else {
+              releaseType = "🐛 Patch Release";
+            }
+
+            // Combine release type with auto-generated notes
+            const releaseNotes = `${releaseType} ${tag}\n\n${response.data.body}`;
+
+            // Write to file for use in release creation
+            const fs = require('fs');
+            fs.writeFileSync('release-notes.txt', releaseNotes);
+
+            // Also output for debugging
+            core.setOutput('release_notes', releaseNotes);
+            core.setOutput('release_name', response.data.name);
+
+      - name: Create GitHub Release
+        if: steps.is_major.outputs.major == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.bump_tag.outputs.new_tag }}" \
+            --title "Release ${{ steps.bump_tag.outputs.new_tag }}" \
+            --notes-file release-notes.txt

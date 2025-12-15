@@ -1,0 +1,54 @@
+#
+# PSRule for Azure configuration
+#
+
+# Please see the documentation for all configuration options:
+# https://aka.ms/ps-rule-azure
+# https://aka.ms/ps-rule-azure/options
+# https://aka.ms/ps-rule/options
+# https://aka.ms/ps-rule-azure/bicep
+
+# Use rules from the following modules/
+include:
+  module:
+    - PSRule.Rules.Azure
+
+execution:
+  unprocessedObject: Ignore
+  ruleSuppressed: Ignore
+
+# Require a minimum version of modules that include referenced baseline.
+requires:
+  PSRule: '@pre >=2.9.0'
+  PSRule.Rules.Azure: '@pre >=1.40.0'
+
+configuration:
+  AZURE_BICEP_FILE_EXPANSION: true
+  AZURE_BICEP_PARAMS_FILE_EXPANSION: true
+  AZURE_PARAMETER_FILE_EXPANSION: true
+  AZURE_BICEP_FILE_EXPANSION_TIMEOUT: 30
+  AZURE_DEPLOYMENT_NONSENSITIVE_PARAMETER_NAMES:
+    - secrets
+    - keys
+
+output:
+  culture: ['en-AU']
+
+rule:
+  includeLocal: true
+  exclude:
+    - Azure.VNET.FirewallSubnet # Using 3rd Party NVA Firewall
+    - Azure.VNET.BastionSubnet # No Azure Bastion service in Azure Extended Zones
+    - Azure.VNG.ERAvailabilityZoneSKU # Availability Zone not supported in perth Extended Zones
+
+binding:
+  targetType:
+    - 'resourceType'
+    - 'type'
+
+input:
+  pathIgnore:
+    - '*' # Exclude all files
+    - '!**/*.test.bicep' # But allow, test files
+    - '!**/*.bicepparam' # Finally, test bicep parameter files
+

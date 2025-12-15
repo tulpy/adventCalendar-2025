@@ -1,0 +1,99 @@
+name: 'Reusable Workflow: Deploy'
+
+on:
+  workflow_call:
+    inputs:
+      artifactName:
+        required: true
+        type: string
+      configKey:
+        required: true
+        type: string
+      deploymentLevel:
+        required: true
+        type: string
+      deploymentType:
+        required: true
+        type: string
+      environmentName:
+        required: true
+        type: string
+      location:
+        required: true
+        type: string
+      management-group-id:
+        required: false
+        type: string
+      stackType:
+        required: false
+        type: string
+        default: 'deployment'
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  deploymentJobId: ${{ github.run_id }}-${{ github.run_number }}-${{ github.run_attempt }}-${{ inputs.deploymentType }}
+
+jobs:
+  deploy:
+    name: ${{ inputs.deploymentType == 'create' && 'deploy' || inputs.deploymentType }}
+    environment: ${{ inputs.environmentName }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Download Artifact from Build Job
+        uses: actions/download-artifact@v6
+        with:
+          name: ${{ inputs.artifactName }}
+          path: ${{ github.workspace }}/artifact
+
+      - name: Az Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          #auth-type: 'IDENTITY' # Assuming Managed Identity for GitHub Actions, you'll need to document this
+          allow-no-subscriptions: true
+          enable-AzPSSession: true
+
+      - name: Read Platform Variables
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: read-yaml
+        with:
+          config: ${{ github.workspace }}/.github/platform-variables.yml
+
+      - name: Set Platform Variables
+        run: |
+          echo "templateFile=${{ steps.read-yaml.outputs[format('{0}.templateFile', inputs.configKey)] }}" >> $GITHUB_ENV
+          echo "templateParameterFile=${{ steps.read-yaml.outputs[format('{0}.templateParameterFile', inputs.configKey)] }}" >> $GITHUB_ENV
+
+      - name: Bicep Action
+        uses: azure/bicep-deploy@v2
+        id: bicep
+        with:
+          operation: ${{ inputs.deploymentType }}
+          type: ${{ inputs.stackType }}
+          name: ${{ env.deploymentJobId }}
+          location: ${{ inputs.location }}
+          scope: ${{ inputs.deploymentLevel }}
+          management-group-id: ${{ inputs.management-group-id }}
+          template-file: ${{ env.templateFile }}
+          parameters-file: ${{ env.templateParameterFile }}
+          what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
+          validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
+
+      - name: Azure Cost CLI Summary
+        if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost
+        shell: bash
+        run: |
+          dotnet tool install -g azure-cost-cli
+          # Ensure installed dotnet tools are on PATH for subsequent steps
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+          azure-cost accumulatedCost -o markdown --subscription " ${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> "$GITHUB_STEP_SUMMARY"
+          azure-cost budgets --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> "$GITHUB_STEP_SUMMARY"

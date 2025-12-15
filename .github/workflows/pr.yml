@@ -1,0 +1,203 @@
+---
+name: 'Pull Request'
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PSRULE_DIRECTORY: ./
+  INFRA_WORKING_DIRECTORY: ./
+
+jobs:
+  linting:
+    name: Linting
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint Testing
+        uses: super-linter/super-linter@v8.2.1
+        env:
+          DEFAULT_BRANCH: 'main'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_JSON: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_POWERSHELL: true
+          VALIDATE_YAML: true
+          FILTER_REGEX_EXCLUDE: .*/(src/modules/[^/]+|docs/wiki/(Bicep|PS-Rule|Scripts|policy-documentation)|\.github/prompts/).*\.md$
+
+  markdown-links:
+    name: Validate Markdown Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Restore lychee cache
+        uses: actions/cache@v5
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >
+            --cache
+            --max-cache-age 1d
+            --exclude-path '(.*)_Sidebar.md'
+            --exclude-path 'home.md'
+            .
+          fail: true
+
+  pester:
+    runs-on: ubuntu-latest
+    name: Pester
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run ./scripts/Test-AzPester.ps1
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            Write-Information "==> Installing needed modules..." -InformationAction Continue
+            Install-Module -Name Pester -Force
+            Import-Module Pester
+            Write-Information "==> Running script..." -InformationAction Continue
+            ./scripts/Test-AzPester.ps1
+          azPSVersion: 'latest'
+
+  psrule-tests-modules:
+    runs-on: ubuntu-latest
+    name: Run PSRule Tests [Modules]
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: PSRule >> Modules
+        uses: ./.github/actions/ps-rule
+        with:
+          option: 'ps-rule.yaml'
+          bicepPath: 'src/modules'
+          path: ${{ env.PSRULE_DIRECTORY }}
+
+  psrule-tests-configuration:
+    runs-on: ubuntu-latest
+    name: Run PSRule Tests [Configuration]
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: PSRule >> Configuration
+        uses: ./.github/actions/ps-rule
+        with:
+          option: 'ps-rule.yaml'
+          bicepPath: 'src/configuration'
+          path: ${{ env.PSRULE_DIRECTORY }}
+
+  ps-docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check out pull request
+        run: |
+          set -euo pipefail
+          echo "==> Check out Pull Request"
+          gh pr checkout ${{ github.event.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Install Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10' # Version supported for diagrams and graphviz
+
+      # Run Set-Documentation.ps1
+      - name: Run ./scripts/Set-Documentation.ps1
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            Write-Information "==> Installing needed modules..." -InformationAction Continue
+            Install-Module -Name powershell-yaml -Force -SkipPublisherCheck
+            Install-Module -Name PSDocs -Force -SkipPublisherCheck
+            Install-Module -Name PSDocs.Azure -Force -SkipPublisherCheck
+            Write-Information "==> Running script..." -InformationAction Continue
+            ./scripts/Set-Documentation.ps1 -GitHub
+          azPSVersion: 'latest'
+
+      - name: Install Diagrams as Code
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+          pip install diagrams
+
+      - name: Install Required Modules
+        uses: Azure/powershell@v2
+        with:
+          inlineScript: |
+            Install-Module EnterprisePolicyAsCode -Force
+            Install-Module Az.ResourceGraph -Force
+          azPSVersion: 'latest'
+
+      - name: Check for changes
+        id: git_status
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Found changes to commit"
+            git status --short
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No changes to commit"
+          fi
+
+      - name: Git commit & push (${{ github.event.pull_request.head.repo.full_name }})
+        if: steps.git_status.outputs.changes == 'true'
+        run: |
+          set -euo pipefail
+          git config core.autocrlf false
+          git add --all
+          git commit -m "docs: auto-generated documentation update for PR #${{ github.event.number }}"
+          git push

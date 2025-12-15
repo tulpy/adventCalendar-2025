@@ -1,0 +1,179 @@
+---
+name: 'Release - Platform Services (Canary)'
+
+on:
+  push:
+    branches:
+      - feat/**
+    paths:
+      - 'src/orchestration/platform/platform.bicep'
+      - 'src/configuration/platform/platform-canary.bicepparam'
+
+  workflow_dispatch: {}
+
+env:
+  PSRULE_DIRECTORY: ./
+  INFRA_WORKING_DIRECTORY: ./
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linting:
+    name: Linting
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lint Testing
+        uses: super-linter/super-linter@v8.2.1
+        env:
+          DEFAULT_BRANCH: 'main'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_JSON: true
+          VALIDATE_MARKDOWN: true
+          VALIDATE_POWERSHELL: true
+          VALIDATE_YAML: true
+          FILTER_REGEX_EXCLUDE: .*/(src/modules/[^/]+|docs/wiki/(Bicep|PS-Rule|Scripts|policy-documentation)|\.github/prompts/).*\.md$
+
+  pester:
+    runs-on: ubuntu-latest
+    name: Pester
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run ./scripts/Test-AzPester.ps1
+        uses: azure/powershell@v2
+        with:
+          inlineScript: |
+            Write-Information '==> Installing needed modules...' -InformationAction Continue
+            Install-Module -Name Pester -Force
+            Import-Module Pester
+            Write-Information '==> Running script...' -InformationAction Continue
+            ./scripts/Test-AzPester.ps1
+          azPSVersion: 'latest'
+
+  psrule-tests-modules:
+    runs-on: ubuntu-latest
+    name: Run PSRule Tests [Modules]
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: PSRule >> Modules
+        uses: ./.github/actions/ps-rule
+        with:
+          option: 'ps-rule.yaml'
+          bicepPath: 'src/modules'
+          path: ${{ env.PSRULE_DIRECTORY }}
+
+  psrule-tests-configuration:
+    runs-on: ubuntu-latest
+    name: Run PSRule Tests [Configuration]
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: PSRule >> Configuration
+        uses: ./.github/actions/ps-rule
+        with:
+          option: 'ps-rule.yaml'
+          bicepPath: 'src/configuration'
+          path: ${{ env.PSRULE_DIRECTORY }}
+
+  build-infrastructure:
+    name: Build
+    if: always() && !cancelled() && !failure()
+    runs-on: ubuntu-latest
+    needs:
+      - linting
+      - psrule-tests-modules
+      - psrule-tests-configuration
+      - pester
+    permissions:
+      contents: read
+    steps:
+      - name: Check-Out Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Build Directory
+        run: |
+          set -euo pipefail
+          echo 'Setting up build directory...'
+          mkdir -p ./build
+          echo 'Build directory created'
+
+      - name: Copy Files for Artifact Upload
+        run: |
+          set -euo pipefail
+          echo 'Copying files to build directory...'
+          rsync -av --progress \
+            --exclude='build' \
+            --exclude='.vscode/' \
+            --exclude='.ps-rule/' \
+            --exclude='.ps-docs/' \
+            --exclude='*.md' \
+            --exclude='.git/' \
+            ./. ./build/
+        working-directory: ${{ env.INFRA_WORKING_DIRECTORY }}
+
+      - name: Upload Infrastructure Artifact
+        id: artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: infrastructure
+          path: ${{ env.INFRA_WORKING_DIRECTORY }}
+          include-hidden-files: true #Required for .github folder to be uploaded in the artifact
+
+  what-if:
+    name: Bicep
+    uses: ./.github/workflows/deploy.yml
+    needs:
+      - build-infrastructure
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      artifactName: infrastructure
+      configKey: deploy_Platform_Canary
+      deploymentLevel: 'managementGroup'
+      deploymentType: 'whatIf'
+      environmentName: whatif
+      location: ${{ vars.LOCATION }}
+      management-group-id: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
+    secrets: inherit
+
+  deploy:
+    name: Bicep
+    if: github.ref == 'refs/heads/main' # Deploys only from main branch
+    uses: ./.github/workflows/deploy.yml
+    needs:
+      - what-if
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      artifactName: infrastructure
+      configKey: deploy_Platform_Canary
+      deploymentLevel: 'managementGroup'
+      deploymentType: 'create'
+      environmentName: platform_canary
+      location: ${{ vars.LOCATION }}
+      management-group-id: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
+    secrets: inherit
