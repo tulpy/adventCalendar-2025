@@ -13,7 +13,7 @@ param tags = {
   dataClassification: 'Internal'
   iac: 'Bicep'
 }
-param subscriptionManagementGroupAssociationEnabled = true
+param subscriptionManagementGroupAssociationEnabled = false
 param subscriptionMgPlacement = 'mg-alz-platform-management'
 param deployBudgets = true
 param budgetConfiguration = {
