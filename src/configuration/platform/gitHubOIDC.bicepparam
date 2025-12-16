@@ -1,7 +1,7 @@
 using '../../modules/gitHubOIDC/gitHubOIDC.bicep'
 
-param gitHubOwner = 'Insight-Services-APAC'
-param gitHubRepo = 'azure-landing-zones-perth-extended-zone'
+param gitHubOwner = 'tulpy'
+param gitHubRepo = 'adventCalendar-2025'
 
 param gitHubConfiguration = [
   {

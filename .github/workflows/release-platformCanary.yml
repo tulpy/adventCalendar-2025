@@ -154,7 +154,7 @@ jobs:
       configKey: deploy_Platform_Canary
       deploymentLevel: 'managementGroup'
       deploymentType: 'whatIf'
-      environmentName: whatif
+      environmentName: platform_canary
       location: ${{ vars.LOCATION }}
       management-group-id: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
     secrets: inherit
