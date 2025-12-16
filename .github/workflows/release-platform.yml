@@ -153,7 +153,7 @@ jobs:
       configKey: deploy_Platform
       deploymentLevel: 'managementGroup'
       deploymentType: 'whatIf'
-      environmentName: whatif
+      environmentName: platform
       location: ${{ vars.LOCATION }}
       management-group-id: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
     secrets: inherit

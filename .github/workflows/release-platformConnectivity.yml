@@ -154,7 +154,7 @@ jobs:
       configKey: deploy_Platform_Connectivity
       deploymentLevel: 'managementGroup'
       deploymentType: 'whatIf'
-      environmentName: whatif
+      environmentName: platform_connectivity
       location: ${{ vars.LOCATION }}
       management-group-id: ${{ vars.INT_ROOT_MANAGEMENT_GROUP_ID }}
     secrets: inherit
