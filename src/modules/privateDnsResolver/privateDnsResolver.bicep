@@ -49,7 +49,7 @@ resource outEndpoint 'Microsoft.Network/dnsResolvers/outboundEndpoints@2025-10-0
   location: location
   properties: {
     subnet: {
-      id: resourceId(virtualNetworkResourceId, 'subnets', 'outboundDNSSubnet')
+      id: '${virtualNetworkResourceId}/subnets/outboundDNSSubnet'
     }
   }
 }

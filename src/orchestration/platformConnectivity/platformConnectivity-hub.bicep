@@ -455,13 +455,12 @@ module privateDnsResolver '../../modules/privateDnsResolver/privateDnsResolver.b
   }
 }
 
-/*
 @description('Module: Private Link Private DNS Zones - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/network/private-link-private-dns-zones')
 module privateLinkPrivateDnsZones 'br/public:avm/ptn/network/private-link-private-dns-zones:0.7.1' = {
   name: take('privateLinkPrivateDnsZones-${guid(deployment().name)}', 64)
   scope: resourceGroup(subscriptionId, resourceGroups.privateDns)
   dependsOn: [
-    resourceGroupForPrivateDNS
+    resourceGroupForPrivateDns
   ]
   params: {
     additionalPrivateLinkPrivateDnsZonesToInclude: [
@@ -482,12 +481,9 @@ module privateLinkPrivateDnsZones 'br/public:avm/ptn/network/private-link-privat
         registrationEnabled: false
         resolutionPolicy: 'NxDomainRedirect'
         tags: tags
-        virtualNetworkResourceId: '<virtualNetworkResourceId>'
+        virtualNetworkResourceId: hubNetworking!.outputs.hubVirtualNetworkId
       }
-    ]
-    virtualNetworkResourceIdsToLinkTo: [
-      '<vnet1ResourceId>'
     ]
   }
 }
-*/
+

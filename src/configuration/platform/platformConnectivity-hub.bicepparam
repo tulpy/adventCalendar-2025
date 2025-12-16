@@ -78,8 +78,9 @@ param subnetsArray = [
     delegation: 'Microsoft.Network/dnsResolvers'
   }
 ]
-param azFirewallEnabled = true
+param azFirewallEnabled = false
 param erGwyEnabled = false
-param vpnGwyEnabled = true
-param azBastionEnabled = true
+param vpnGwyEnabled = false
+param azBastionEnabled = false
+param privateResolverEnabled = true
 param actionGroupResourceId = '/subscriptions/a50d2a27-93d9-43b1-957c-2a663ffaf37f/resourceGroups/alertsRG/providers/Microsoft.Insights/actiongroups/platmgmtActionGroup'
