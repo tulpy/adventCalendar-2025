@@ -150,7 +150,7 @@ jobs:
       id-token: write
     with:
       artifactName: infrastructure
-      configKey: deploy_Platform
+      configKey: deploy_Platform_Tenant
       deploymentLevel: 'managementGroup'
       type: 'deployment'
       deploymentType: 'whatIf'
@@ -170,7 +170,7 @@ jobs:
       id-token: write
     with:
       artifactName: infrastructure
-      configKey: deploy_Platform
+      configKey: deploy_Platform_Tenant
       deploymentLevel: 'managementGroup'
       type: 'deploymentStack'
       deploymentType: 'create'

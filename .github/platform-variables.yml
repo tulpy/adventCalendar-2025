@@ -1,0 +1,47 @@
+# Platform Services
+## Tenant
+deploy_Platform_Tenant:
+  templateFile: ./src/orchestration/platform/platform.bicep
+  templateParameterFile: ./src/configuration/platform/platform-tenant.bicepparam
+
+## Canary
+deploy_Platform_Canary:
+  templateFile: ./src/orchestration/platform/platform.bicep
+  templateParameterFile: ./src/configuration/platform/platform-canary.bicepparam
+
+## GitHub OIDC Permissions
+deploy_GitHub_Config:
+  templateFile: ./src/modules/gitHubOIDC/gitHubOIDC-mg.bicep
+  templateParameterFile: ./src/configuration/platform/gitHubOIDC-mg.bicepparam
+
+# Platform Landing Zone Subscriptions
+## Connectivity
+deploy_Platform_Connectivity:
+  templateFile: ./src/orchestration/platformConnectivity/platformConnectivity-hub.bicep
+  templateParameterFile: ./src/configuration/platform/platformConnectivityHub-per.bicepparam
+
+## Management
+deploy_Platform_Management:
+  templateFile: ./src/orchestration/platformManagement/platformManagement.bicep
+  templateParameterFile: ./src/configuration/platform/platformManagement.bicepparam
+
+## Identity
+deploy_Platform_Identity:
+  templateFile: ./src/orchestration/platformIdentity/platformIdentity-per.bicep
+  templateParameterFile: ./src/configuration/platform/platformIdentity-per.bicepparam
+
+# Application Landing Zone Subscriptions
+## Connectivity
+deploy_Iaas_Development:
+  templateFile: ./src/orchestration/subscriptionVending/subscriptionVending.bicep
+  templateParameterFile: ./src/configuration/lz/dot-az-ez-iaas_dev.bicepparam
+
+## Management
+deploy_Iaas_UAT:
+  templateFile: ./src/orchestration/subscriptionVending/subscriptionVending.bicep
+  templateParameterFile: ./src/configuration/lz/dot-az-ez-iaas_uat.bicepparam
+
+## Identity
+deploy_Iaas_Production:
+  templateFile: ./src/orchestration/subscriptionVending/subscriptionVending.bicep
+  templateParameterFile: ./src/configuration/lz/dot-az-ez-iaas_prd.bicepparam
