@@ -152,7 +152,7 @@ jobs:
       artifactName: infrastructure
       configKey: deploy_Platform
       deploymentLevel: 'managementGroup'
-      type: 'deploymentStack'
+      type: 'deployment'
       deploymentType: 'whatIf'
       environmentName: platform
       location: ${{ vars.LOCATION }}
