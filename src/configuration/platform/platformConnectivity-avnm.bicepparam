@@ -1,6 +1,16 @@
 using '../../modules/avnm/avnm.bicep'
 
 param deploy = true // Set to false to skip deployment of AVNM resources and get a plan only.
+param tags = {
+  environment: 'conn'
+  applicationName: 'Azure Virtual Network Manager'
+  owner: 'Platform Team'
+  criticality: 'Tier0'
+  costCenter: '1234'
+  contactEmail: 'test@outlook.com'
+  dataClassification: 'Internal'
+  iac: 'Bicep'
+}
 param avnmConfiguration = {
   name: 'avnm-aue-plat-conn-01'
   subscriptionScopes: []

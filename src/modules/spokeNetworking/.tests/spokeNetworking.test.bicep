@@ -13,6 +13,7 @@ module testDeployment '../spokeNetworking.bicep' = {
     spokeNetworks: [
       {
         name: 'vnet-syd-sap-prd-001'
+        location: 'australiaeast'
         addressPrefixes: ['10.0.0.0/16']
         subnets: [
           {
