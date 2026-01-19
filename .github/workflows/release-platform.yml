@@ -152,6 +152,7 @@ jobs:
       artifactName: infrastructure
       configKey: deploy_Platform
       deploymentLevel: 'managementGroup'
+      type: 'deploymentStack'
       deploymentType: 'whatIf'
       environmentName: platform
       location: ${{ vars.LOCATION }}
@@ -160,7 +161,7 @@ jobs:
 
   deploy:
     name: Bicep
-    if: github.ref == 'refs/heads/main' # Deploys only from main branch
+    # if: github.ref == 'refs/heads/main' # Deploys only from main branch
     uses: ./.github/workflows/deploy.yml
     needs:
       - what-if
@@ -171,6 +172,7 @@ jobs:
       artifactName: infrastructure
       configKey: deploy_Platform
       deploymentLevel: 'managementGroup'
+      type: 'deploymentStack'
       deploymentType: 'create'
       environmentName: platform
       location: ${{ vars.LOCATION }}

@@ -29,7 +29,7 @@ type tagsType = {
   costCenter: string
   criticality: 'Tier0' | 'Tier1' | 'Tier2' | 'Tier3'
   dataClassification: 'Internal' | 'Confidential' | 'Secret' | 'Top Secret'
-  environment: 'sbx' | 'dev' | 'tst' | 'prd' | 'idam' | 'mgmt' | 'conn'
+  environment: 'sbx' | 'dev' | 'tst' | 'prd' | 'idam' | 'mgmt' | 'conn' | 'sec'
   iac: 'Bicep'
   owner: string
   *: string
@@ -47,6 +47,9 @@ type virtualNetworkType = {
   @description('Required. The address prefix of the virtual network to create.')
   addressPrefixes: array
 
+  @description('Required. The location of the virtual network.')
+  location: string
+
   @description('Optional. Number of IP addresses allocated from the pool. To be used only when the addressPrefix param is defined with a resource ID of an IPAM pool.')
   ipamPoolNumberOfIpAddresses: string?
 
@@ -59,11 +62,17 @@ type virtualNetworkType = {
   @description('Optional. A value indicating whether this route overrides overlapping BGP routes regardless of LPM.')
   disableBgpRoutePropagation: bool?
 
+  @description('Optional. The resource ID of the hub virtual network or virtual hub to peer with.')
+  hubVirtualNetworkResourceId: string?
+
   @description('Required. The subnet type.')
   subnets: subnetType
 
+  @description('Required. Deploy VNet peering for the virtual network.')
+  deployPeering: bool
+
   @description('Optional. Virtual Network Peering configurations.')
-  peerings: peeringType[]?
+  peeringSettings: peeringSettingsType?
 
   @description('Optional. The lock settings of the service.')
   lock: lockType?
@@ -80,7 +89,7 @@ type subnetType = {
   name: string
 
   @description('Conditional. The address prefix for the subnet. Required if `addressPrefixes` is empty.')
-  addressPrefix: string
+  addressPrefix: string?
 
   @description('Conditional. List of address prefixes for the subnet. Required if `addressPrefix` is empty.')
   addressPrefixes: string[]?
@@ -221,7 +230,7 @@ type securityRules = {
 // Azure Virtual Network Peering Type
 @export()
 @description('The type for peering configuration.')
-type peeringType = {
+type peeringSettingsType = {
   @description('Optional. The Name of VNET Peering resource. If not provided, default value will be peer-localVnetName-remoteVnetName.')
   name: string?
 

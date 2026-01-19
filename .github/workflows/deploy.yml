@@ -24,10 +24,9 @@ on:
       management-group-id:
         required: false
         type: string
-      stackType:
-        required: false
+      type:
+        required: true
         type: string
-        default: 'deployment'
 
 permissions:
   contents: read
@@ -58,7 +57,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          #auth-type: 'IDENTITY' # Assuming Managed Identity for GitHub Actions, you'll need to document this
           allow-no-subscriptions: true
           enable-AzPSSession: true
 
@@ -78,7 +76,7 @@ jobs:
         id: bicep
         with:
           operation: ${{ inputs.deploymentType }}
-          type: ${{ inputs.stackType }}
+          type: ${{ inputs.type }}
           name: ${{ env.deploymentJobId }}
           location: ${{ inputs.location }}
           scope: ${{ inputs.deploymentLevel }}
@@ -87,6 +85,8 @@ jobs:
           parameters-file: ${{ env.templateParameterFile }}
           what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
           validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
+          action-on-unmanage-managementgroup: delete
+          deny-settings-mode: denyWriteAndDelete
 
       - name: Azure Cost CLI Summary
         if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost

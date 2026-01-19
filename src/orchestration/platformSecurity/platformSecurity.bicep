@@ -10,18 +10,15 @@ import {
   tagsType
   roleAssignmentsType
   budgetType
+  actionGroupType
+  virtualNetworkType
 } from '../../configuration/shared/lz.type.bicep'
-
-import {
-  // Hub Networking User Defined Types
-  hubVirtualNetworkType
-} from '../../configuration/shared/hub.type.bicep'
 
 targetScope = 'subscription'
 
-metadata name = 'Platform Connectivity Landing Zone - AVM'
-metadata description = 'Platform Connectivity Landing Zone Orchestration.'
-metadata version = '1.0.0'
+metadata name = 'Platform Security Landing Zone - AVM'
+metadata description = 'AVM Platform Security Landing Zone Orchestration.'
+metadata version = '0.1.0'
 metadata author = 'Insight APAC Platform Engineering'
 
 @minLength(2)
@@ -33,9 +30,8 @@ param lzId string
 @description('Required. Specifies the environment Id for the deployment.')
 param envId string
 
-@description('Optional. Array of locations for reference purposes. This parameter is primarily used in parameter files for convenience when defining hubNetworks array.')
-#disable-next-line no-unused-params
-param locations array = []
+@description('Required. Array of locations for reference purposes. This parameter is primarily used in parameter files for convenience.')
+param locations array
 
 @description('Optional. The Subscription Id for the deployment.')
 @maxLength(36)
@@ -56,21 +52,29 @@ param roleAssignments roleAssignmentsType?
 @description('Optional. Configuration for Azure Budgets.')
 param budgetConfiguration budgetType?
 
-@description('Required. Specifies the list of Azure Regions to deploy the Hub resources into.')
-param hubNetworkingConfiguration hubVirtualNetworkType
-
 @description('Optional. The Action Group Resource Id to be used for Service Health Alerts.')
 param actionGroupResourceId string?
+
+@description('Optional. Configuration for Azure Virtual Network.')
+param spokeNetworkingConfiguration virtualNetworkType[]?
+
+@description('Optional. Array of Resource IDs for remote virtual networks or virtual hubs to peer with. Must match the number of spokes in spokeNetworks array if provided.')
+param hubVirtualNetworkResourceIds string[] = []
+
+// Orchestration Variables
+var udrId = [for location in locations: toLower('${resIds.routeTable}-${locIds[location]}-${lzId}-${envId}')]
+var nsgId = [for location in locations: toLower('${resIds.networkSecurityGroup}-${locIds[location]}-${lzId}-${envId}')]
+//var argId = toLower('${resIds.resourceGroup}-${locIds[locations[0]]}-${lzId}-${envId}')
 
 var networkResourceGroups = [
   for location in locations: toLower('${resIds.resourceGroup}-${locIds[location]}-${lzId}-${envId}-network')
 ]
-var privateDnsResourceGroups = [
-  for location in locations: toLower('${resIds.resourceGroup}-${locIds[location]}-${lzId}-${envId}-privatedns')
-]
-var privateDnsResolverResourceGroups = [
-  for location in locations: toLower('${resIds.resourceGroup}-${locIds[location]}-${lzId}-${envId}-privatednsresolver')
-]
+
+/* Update when the Setinel module is available
+var resourceGroups = {
+  sentinel: '${argId}-sentinel'
+}
+*/
 
 @description('Module: Subscription Tags')
 module subscriptionTags '../../modules/tags/subscriptionTags.bicep' = if (!empty(tags)) {
@@ -164,15 +168,16 @@ module networkWatcher 'br/public:avm/res/network/network-watcher:0.5.0' = [
   }
 ]
 
-@description('Module: Hub Networking')
-module hubNetworking '../../modules/hubNetworking/hubNetworking.bicep' = {
-  name: take('hubNetworking-${guid(deployment().name)}', 64)
+@description('Module: Spoke Networking')
+module spokeNetworking '../../modules/spokeNetworking/spokeNetworking.bicep' = if (!empty(spokeNetworkingConfiguration)) {
+  scope: az.subscription(subscriptionId)
   params: {
-    parHubNetworkingResourceGroupNameOverrides: networkResourceGroups
-    parDnsResourceGroupNameOverrides: privateDnsResourceGroups
-    parDnsPrivateResolverResourceGroupNameOverrides: privateDnsResolverResourceGroups
-    parTags: tags
-    parLocations: locations
-    hubNetworks: hubNetworkingConfiguration
+    spokeNetworkingResourceGroupNameOverrides: networkResourceGroups
+    nsgId: nsgId
+    tags: tags
+    udrId: udrId
+    locations: locations
+    spokeNetworks: spokeNetworkingConfiguration ?? []
+    hubVirtualNetworkResourceId: hubVirtualNetworkResourceIds
   }
 }
