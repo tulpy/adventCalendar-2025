@@ -52,11 +52,6 @@ param budgetConfiguration = {
     }
   ]
 }
-param actionGroupConfiguration = {
-  emailReceivers: [
-    'test@outlook.com'
-  ]
-}
 param spokeNetworkingConfiguration = [
   {
     name: toLower('${resIds.virtualNetwork}-${locIds[locations[0]]}-${lzId}-${envId}-10.0.4.0_24')
