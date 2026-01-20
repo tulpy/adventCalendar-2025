@@ -86,7 +86,7 @@ jobs:
           what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
           validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
           action-on-unmanage-managementgroup: delete
-          action-on-unmanage-resources: delete
+          action-on-unmanage-resources: detach
           deny-settings-mode: denyWriteAndDelete
 
       - name: Azure Cost CLI Summary
