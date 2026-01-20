@@ -87,7 +87,7 @@ jobs:
           validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
           action-on-unmanage-managementgroup: delete
           action-on-unmanage-resources: detach
-          deny-settings-mode: denyWriteAndDelete
+          deny-settings-mode: none
 
       - name: Azure Cost CLI Summary
         if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost
