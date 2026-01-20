@@ -89,10 +89,7 @@ jobs:
           action-on-unmanage-resources: delete
           deny-settings-mode: none
           description: 'test deployment'
-          tags: |
-            deployedBy: githubActions
-            environment: ${{ inputs.environmentName }}
-            deploymentType: ${{ inputs.deploymentType }}
+          tags: '{"deployedBy": "githubActions", "environment": "${{ inputs.environmentName }}", "deploymentType": "${{ inputs.deploymentType }}"}'
 
       - name: Azure Cost CLI Summary
         if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost
