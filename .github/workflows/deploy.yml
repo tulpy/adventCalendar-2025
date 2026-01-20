@@ -21,11 +21,14 @@ on:
       location:
         required: true
         type: string
-      management-group-id:
+      managementGroupId:
         required: false
         type: string
       type:
         required: true
+        type: string
+      description:
+        required: false
         type: string
 
 permissions:
@@ -72,6 +75,7 @@ jobs:
           echo "templateParameterFile=${{ steps.read-yaml.outputs[format('{0}.templateParameterFile', inputs.configKey)] }}" >> $GITHUB_ENV
 
       - name: Bicep Action
+        if: ${{ inputs.deploymentLevel == 'managementGroup' }}
         uses: azure/bicep-deploy@v2
         id: bicep
         with:
@@ -80,16 +84,14 @@ jobs:
           name: ${{ env.deploymentJobId }}
           location: ${{ inputs.location }}
           scope: ${{ inputs.deploymentLevel }}
-          management-group-id: ${{ inputs.management-group-id }}
+          management-group-id: ${{ inputs.managementGroupId }}
           template-file: ${{ env.templateFile }}
           parameters-file: ${{ env.templateParameterFile }}
           what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
           validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
           action-on-unmanage-managementgroup: delete
-          action-on-unmanage-resources: delete
-          deny-settings-mode: none
-          description: 'test deployment'
-          tags: '{"deployedBy": "githubActions", "environment": "${{ inputs.environmentName }}", "deploymentType": "${{ inputs.deploymentType }}"}'
+          deny-settings-mode: ${{ inputs.type == 'deploymentStacks' && 'none' || '' }}
+          description: ${{ inputs.type == 'deploymentStacks' && inputs.description || '' }}
 
       - name: Azure Cost CLI Summary
         if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost

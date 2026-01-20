@@ -156,7 +156,7 @@ jobs:
       deploymentType: 'whatIf'
       environmentName: platform
       location: ${{ vars.LOCATION }}
-      management-group-id: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
+      managementGroupId: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
     secrets: inherit
 
   deploy:
@@ -176,5 +176,6 @@ jobs:
       deploymentType: 'create'
       environmentName: platform
       location: ${{ vars.LOCATION }}
-      management-group-id: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
+      managementGroupId: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
+      description: 'Deploy Platform Services'
     secrets: inherit
