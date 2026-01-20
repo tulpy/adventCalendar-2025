@@ -88,6 +88,7 @@ jobs:
           action-on-unmanage-managementgroup: delete
           action-on-unmanage-resources: delete
           deny-settings-mode: none
+          description: 'test deployment'
 
       - name: Azure Cost CLI Summary
         if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost
