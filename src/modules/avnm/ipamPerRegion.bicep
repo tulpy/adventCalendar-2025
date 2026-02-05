@@ -16,9 +16,6 @@ param rootIPAMpoolName string
 @description('Required. Name of the existing Azure Virtual Network Manager.')
 param avnmName string
 
-@description('Required. Set to true to deploy IPAM resources, false to only generate outputs.')
-param deploy bool
-
 @maxValue(32)
 @minValue(8)
 @description('CIDR size for the region IPAM pool. This is used to determine how many subnets can be created within the region CIDR.')
@@ -51,12 +48,12 @@ var platformCIDRs = platformSubnets
 var applicationCIDRs = applicationSubnets
 
 @description('Resource: Existing Azure Virtual Network Manager.')
-resource avnm 'Microsoft.Network/networkManagers@2024-05-01' existing = if (deploy) {
+resource avnm 'Microsoft.Network/networkManagers@2024-05-01' existing = {
   name: avnmName
 }
 
 @description('Resource: Region IPAM Pool.')
-resource regionIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01' = if (deploy) {
+resource regionIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01' = {
   name: 'regionIpamPool-${replace(location, ' ', '-')}-${replace(regionCidr, '/', '-')}'
   parent: avnm
   location: location
@@ -72,7 +69,7 @@ resource regionIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01'
 }
 
 @description('Resource: Platform Landing Zone IPAM Pool.')
-resource platformIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01' = if (deploy) {
+resource platformIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01' = {
   name: 'platformIpamPool-${replace(location, ' ', '-')}'
   parent: avnm
   location: location
@@ -89,13 +86,13 @@ resource platformIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-0
 }
 
 @description('Resource: Application IPAM Pool for the region.')
-resource applicationIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01' = if (deploy) {
+resource applicationIpamPool 'Microsoft.Network/networkManagers/ipamPools@2024-05-01' = {
   name: 'applicationIpamPool-${replace(location, ' ', '-')}'
   parent: avnm
   location: location
   tags: tags
   dependsOn: [
-    regionIpamPool
+    platformIpamPool
   ]
   properties: {
     addressPrefixes: applicationCIDRs

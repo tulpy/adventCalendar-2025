@@ -61,7 +61,7 @@ param spokeNetworkingConfiguration = [
     name: toLower('${resIds.virtualNetwork}-${locIds[locations[0]]}-${lzId}-${envId}-01')
     location: locations[0]
     addressPrefixes: [
-      '/subscriptions/5cb7efe0-67af-4723-ab35-0f2b42a85839/resourceGroups/ascExportRG/providers/Microsoft.Network/networkManagers/avnm-01/ipamPools/platformIpamPool-australiaeast'
+      '/subscriptions/5cb7efe0-67af-4723-ab35-0f2b42a85839/resourceGroups/arg-aue-plat-conn-network/providers/Microsoft.Network/networkManagers/avnm-aue-plat-conn-01/ipamPools/applicationIpamPool-australiaeast'
     ]
     ipamPoolNumberOfIpAddresses: '254'
     dnsServers: [
@@ -83,7 +83,7 @@ param spokeNetworkingConfiguration = [
           {
             numberOfIpAddresses: '64'
             pool: {
-              id: '/subscriptions/5cb7efe0-67af-4723-ab35-0f2b42a85839/resourceGroups/ascExportRG/providers/Microsoft.Network/networkManagers/avnm-01/ipamPools/platformIpamPool-australiaeast'
+              id: '/subscriptions/5cb7efe0-67af-4723-ab35-0f2b42a85839/resourceGroups/arg-aue-plat-conn-network/providers/Microsoft.Network/networkManagers/avnm-aue-plat-conn-01/ipamPools/applicationIpamPool-australiaeast'
             }
           }
         ]
