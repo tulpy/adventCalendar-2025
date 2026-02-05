@@ -24,10 +24,25 @@ on:
       managementGroupId:
         required: false
         type: string
+      subscriptionId:
+        required: false
+        type: string
+      resourceGroupName:
+        required: false
+        type: string
       type:
         required: true
         type: string
       description:
+        required: false
+        type: string
+      actionOnUnmanageManagementgroup:
+        required: false
+        type: string
+      actionOnUnmanageResources:
+        required: false
+        type: string
+      denySettingsMode:
         required: false
         type: string
 
@@ -74,23 +89,45 @@ jobs:
           echo "templateFile=${{ steps.read-yaml.outputs[format('{0}.templateFile', inputs.configKey)] }}" >> $GITHUB_ENV
           echo "templateParameterFile=${{ steps.read-yaml.outputs[format('{0}.templateParameterFile', inputs.configKey)] }}" >> $GITHUB_ENV
 
-      - name: Bicep Action
-        if: ${{ inputs.deploymentLevel == 'managementGroup' }}
+      - name: Bicep Action - Subscription Scope
+        if: ${{ inputs.deploymentLevel == 'subscription' }}
         uses: azure/bicep-deploy@v2
-        id: bicep
+        id: bicepSub
         with:
           operation: ${{ inputs.deploymentType }}
           type: ${{ inputs.type }}
           name: ${{ env.deploymentJobId }}
           location: ${{ inputs.location }}
-          scope: ${{ inputs.deploymentLevel }}
+          scope: 'subscription'
+          subscription-id: ${{ inputs.subscriptionId }}
+          template-file: ${{ env.templateFile }}
+          parameters-file: ${{ env.templateParameterFile }}
+          what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
+          validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
+          action-on-unmanage-resourcegroups: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageManagementgroup || '' }}
+          action-on-unmanage-resources: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageResources || '' }}
+          deny-settings-mode: ${{ inputs.type == 'deploymentStacks' && inputs.denySettingsMode || '' }}
+          description: ${{ inputs.type == 'deploymentStacks' && inputs.description || '' }}
+
+
+      - name: Bicep Action - Management Group Scope
+        if: ${{ inputs.deploymentLevel == 'managementGroup' }}
+        uses: azure/bicep-deploy@v2
+        id: bicepMg
+        with:
+          operation: ${{ inputs.deploymentType }}
+          type: ${{ inputs.type }}
+          name: ${{ env.deploymentJobId }}
+          location: ${{ inputs.location }}
+          scope: 'managementGroup'
           management-group-id: ${{ inputs.managementGroupId }}
           template-file: ${{ env.templateFile }}
           parameters-file: ${{ env.templateParameterFile }}
           what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
           validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
-          action-on-unmanage-managementgroup: delete
-          deny-settings-mode: ${{ inputs.type == 'deploymentStacks' && 'none' || '' }}
+          action-on-unmanage-managementgroup: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageManagementgroup || '' }}
+          action-on-unmanage-resources: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageResources || '' }}
+          deny-settings-mode: ${{ inputs.type == 'deploymentStacks' && inputs.denySettingsMode || '' }}
           description: ${{ inputs.type == 'deploymentStacks' && inputs.description || '' }}
 
       - name: Azure Cost CLI Summary

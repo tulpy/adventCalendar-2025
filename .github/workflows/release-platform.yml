@@ -177,5 +177,8 @@ jobs:
       environmentName: platform
       location: ${{ vars.LOCATION }}
       managementGroupId: ${{ vars.ROOT_MANAGEMENT_GROUP_ID }}
+      actionOnUnmanageManagementgroup: 'delete'
+      actionOnUnmanageResources: 'delete'
+      denySettingsMode: 'none'
       description: 'Deploy Platform Services'
     secrets: inherit
