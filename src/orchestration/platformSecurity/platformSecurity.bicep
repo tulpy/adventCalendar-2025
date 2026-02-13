@@ -8,9 +8,7 @@ import {
 import {
   // Base Landing Zone User Defined Types
   tagsType
-  roleAssignmentsType
   budgetType
-  actionGroupType
   virtualNetworkType
 } from '../../configuration/shared/lz.type.bicep'
 
@@ -46,9 +44,6 @@ param tags tagsType?
 param deployBudgets bool = true
 
 // User Defined Type Parameters
-@description('Optional. Supply an array of objects containing the details of the role assignments to create.')
-param roleAssignments roleAssignmentsType?
-
 @description('Optional. Configuration for Azure Budgets.')
 param budgetConfiguration budgetType?
 
@@ -115,18 +110,6 @@ module commonResourceGroups 'br/public:avm/res/resources/resource-group:0.4.3' =
       // Non-required parameters
       location: locations[0]
       tags: tags
-    }
-  }
-]
-
-@description('Resource: Role Assignments')
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
-  for assignment in (roleAssignments ?? []): if (!empty(roleAssignments)) {
-    name: take(guid(subscriptionId, assignment.principalId, assignment.roleDefinitionIdOrName), 64)
-    properties: {
-      roleDefinitionId: assignment.roleDefinitionIdOrName
-      principalId: assignment.principalId
-      principalType: assignment.principalType
     }
   }
 ]
