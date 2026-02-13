@@ -148,9 +148,9 @@ jobs:
             });
             const pr = prs.data.find(pr => pr.merged_at && pr.merge_commit_sha === context.sha);
             if (!pr) throw new Error('No merged PR found for this commit.');
-            core.setOutput('pr_number', pr.number);
-            core.setOutput('pr_title', pr.title);
-            core.setOutput('pr_body', pr.body);
+            core.setOutput('pr_number', String(pr.number || ''));
+            core.setOutput('pr_title', String(pr.title || ''));
+            core.setOutput('pr_body', String(pr.body || ''));
 
       - name: Check for major release trigger
         id: major_trigger
@@ -183,8 +183,8 @@ jobs:
         id: get_tag
         run: |
           git fetch --tags
-          latest_tag=$(git tag --sort=-v:refname | head -n 1)
-          echo "latest_tag=${latest_tag:-}" >> $GITHUB_OUTPUT
+          latest_tag=$(git tag --sort=-v:refname | head -n 1 || echo "")
+          echo "latest_tag=${latest_tag}" >> "$GITHUB_OUTPUT"
 
       - name: Bump version and create tag
         id: bump_tag
@@ -205,19 +205,19 @@ jobs:
           git config user.email "github-actions@github.com"
           git tag "$new_tag"
           git push origin "$new_tag"
-          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+          echo "new_tag=${new_tag}" >> "$GITHUB_OUTPUT"
 
       - name: Check if major version
         id: is_major
         run: |
-          tag=${{ steps.bump_tag.outputs.new_tag }}
-          major=$(echo $tag | cut -d'.' -f1 | tr -d 'v')
-          minor=$(echo $tag | cut -d'.' -f2)
-          patch=$(echo $tag | cut -d'.' -f3)
-          if [[ "$minor" == "0" && "$patch" == "0" ]]; then
-            echo "major=true" >> $GITHUB_OUTPUT
+          tag="${{ steps.bump_tag.outputs.new_tag }}"
+          major=$(echo "$tag" | cut -d'.' -f1 | tr -d 'v')
+          minor=$(echo "$tag" | cut -d'.' -f2)
+          patch=$(echo "$tag" | cut -d'.' -f3)
+          if [[ "${minor}" == "0" && "${patch}" == "0" ]]; then
+            echo "major=true" >> "$GITHUB_OUTPUT"
           else
-            echo "major=false" >> $GITHUB_OUTPUT
+            echo "major=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Generate release notes
@@ -259,8 +259,8 @@ jobs:
             fs.writeFileSync('release-notes.txt', releaseNotes);
 
             // Also output for debugging
-            core.setOutput('release_notes', releaseNotes);
-            core.setOutput('release_name', response.data.name);
+            core.setOutput('release_notes', String(releaseNotes || ''));
+            core.setOutput('release_name', String(response.data.name || tag));
 
       - name: Create GitHub Release
         if: steps.is_major.outputs.major == 'true'
@@ -309,17 +309,19 @@ jobs:
           echo "|------|-------------|-----------------|" >> current-versions.md
 
           # Find all Bicep files and extract AVM module references
-          find src -name "*.bicep" -type f 2>/dev/null | while read -r file; do
-            grep -oP "br/public:avm/res/[^'\"]+:[0-9]+\.[0-9]+\.[0-9]+" "$file" 2>/dev/null | while read -r module; do
-              path=$(echo "$module" | sed "s/:.*//")
-              version=$(echo "$module" | grep -oP "[0-9]+\.[0-9]+\.[0-9]+$")
-              echo "| $file | $path | $version |" >> current-versions.md
-            done
-          done || true
+          if [ -d "src" ]; then
+            find src -name "*.bicep" -type f 2>/dev/null | while read -r file; do
+              grep -oP "br/public:avm/res/[^'\"]+:[0-9]+\.[0-9]+\.[0-9]+" "$file" 2>/dev/null | while read -r module; do
+                path=$(echo "$module" | sed "s/:.*//")
+                version=$(echo "$module" | grep -oP "[0-9]+\.[0-9]+\.[0-9]+$")
+                echo "| $file | $path | $version |" >> current-versions.md
+              done
+            done || true
+          fi
 
           # Count unique modules found
           module_count=$(grep -c "br/public:avm" current-versions.md 2>/dev/null || echo "0")
-          echo "module_count=${module_count:-0}" >> $GITHUB_OUTPUT
+          echo "module_count=${module_count}" >> "$GITHUB_OUTPUT"
 
           cat current-versions.md
 
