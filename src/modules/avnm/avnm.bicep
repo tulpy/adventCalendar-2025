@@ -1,4 +1,4 @@
-import * as type from '../../configuration/shared.type.bicep'
+import * as type from '../../configuration/shared/lz.type.bicep'
 
 targetScope = 'resourceGroup'
 
@@ -13,9 +13,6 @@ param location string = resourceGroup().location
 @description('Optional. Tags of the resource.')
 param tags type.tagsType?
 
-@description('Required. Name of the Azure Virtual Network Manager.')
-param name string
-
 @description('Required. Configuration for the Azure Virtual Network Manager.')
 param avnmConfiguration object
 
@@ -24,7 +21,7 @@ param regions array
 
 @description('Resource. Azure Virtual Network Manager.')
 resource avnm 'Microsoft.Network/networkManagers@2024-05-01' = {
-  name: name
+  name: avnmConfiguration.name
   location: location
   tags: tags
   properties: {

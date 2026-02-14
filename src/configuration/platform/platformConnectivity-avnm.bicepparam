@@ -1,6 +1,5 @@
 using '../../modules/avnm/avnm.bicep'
 
-param deploy = true // Set to false to skip deployment of AVNM resources and get a plan only.
 param tags = {
   environment: 'conn'
   applicationName: 'Azure Virtual Network Manager'

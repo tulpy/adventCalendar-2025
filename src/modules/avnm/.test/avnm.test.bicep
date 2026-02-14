@@ -4,12 +4,11 @@ module testAVNM '../avnm.bicep' = {
   params: {
     #disable-next-line no-hardcoded-location
     location: 'australiaeast'
-    name: 'test-avnm-nopsema'
     avnmConfiguration: {
       name: 'avnm-aue-plat-conn-01'
       subscriptionScopes: []
       managementGroupScopes: [
-        '/providers/Microsoft.Management/managementGroups/mg-nopsema'
+        '/providers/Microsoft.Management/managementGroups/mg-alz'
       ]
       ipamRootSettings: {
         rootIpamPoolName: 'AU-RootPool'
@@ -34,11 +33,11 @@ module testAVNM '../avnm.bicep' = {
     ]
     tags: {
       applicationName: 'Azure Virtual Network Manager'
-      owner: 'ITC'
+      owner: 'IT'
       criticality: 'Tier0'
-      purchaseOrder: 'PD005110'
-      contactEmail: 'servicedesk@nopsema.gov.au'
-      dataClassification: 'OFFICIAL: Sensitive'
+      costCenter: '1234'
+      contactEmail: 'test@example.com'
+      dataClassification: 'Internal'
       environment: 'prd'
       iac: 'Bicep'
     }

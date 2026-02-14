@@ -3,19 +3,21 @@ targetScope = 'managementGroup'
 metadata name = 'ALZ Bicep - Role Assignment to a Management Group Loop'
 metadata description = 'Module used to assign a roles to Management Group'
 metadata author = 'Insight APAC Platform Engineering'
+metadata version = '1.0.0'
 
+@description('Required. The intermediate root management group where the deployment will be applied.')
 param inRootMG string
 
-@description('Array of Role Assignments to assign at the management group scope.')
+@description('Optional. Array of Role Assignments to assign at the management group scope.')
 param rolesManagementGroups array = []
 
-@description('Array of Role Assignments to assign at the subscription scope.')
+@description('Optional. Array of Role Assignments to assign at the subscription scope.')
 param roleSubscriptions array = []
 
-@description('Array of Role Assignments to assign at the resource group scope.')
+@description('Optional. Array of Role Assignments to assign at the resource group scope.')
 param roleResourceGroups array = []
 
-@description('Array of Role Assignments to assign at the resource scope.')
+@description('Optional. Array of Role Assignments to assign at the resource scope.')
 param roleResources array = []
 
 @description('Module: Role Assignment - Management Group Scope - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/authorization/role-assignment')

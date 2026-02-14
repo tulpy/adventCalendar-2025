@@ -3,8 +3,6 @@ applyTo: '**/*.ps1,**/*.psm1'
 description: 'PowerShell cmdlet and scripting best practices based on Microsoft guidelines'
 ---
 
-<!-- markdownlint-disable  -->
-
 # PowerShell Cmdlet Development Guidelines
 
 This guide provides PowerShell-specific instructions to help GitHub Copilot generate idiomatic,
@@ -13,21 +11,18 @@ safe, and maintainable scripts. It aligns with Microsoft’s PowerShell cmdlet d
 ## Naming Conventions
 
 - **Verb-Noun Format:**
-
   - Use approved PowerShell verbs (Get-Verb)
   - Use singular nouns
   - PascalCase for both verb and noun
   - Avoid special characters and spaces
 
 - **Parameter Names:**
-
   - Use PascalCase
   - Choose clear, descriptive names
   - Use singular form unless always multiple
   - Follow PowerShell standard names
 
 - **Variable Names:**
-
   - Use PascalCase for public variables
   - Use camelCase for private variables
   - Avoid abbreviations
@@ -62,21 +57,18 @@ function Get-UserProfile {
 ## Parameter Design
 
 - **Standard Parameters:**
-
   - Use common parameter names (`Path`, `Name`, `Force`)
   - Follow built-in cmdlet conventions
   - Use aliases for specialized terms
   - Document parameter purpose
 
 - **Parameter Names:**
-
   - Use singular form unless always multiple
   - Choose clear, descriptive names
   - Follow PowerShell conventions
   - Use PascalCase formatting
 
 - **Type Selection:**
-
   - Use common .NET types
   - Implement proper validation
   - Consider ValidateSet for limited options
@@ -118,21 +110,18 @@ function Set-ResourceConfiguration {
 ## Pipeline and Output
 
 - **Pipeline Input:**
-
   - Use `ValueFromPipeline` for direct object input
   - Use `ValueFromPipelineByPropertyName` for property mapping
   - Implement Begin/Process/End blocks for pipeline handling
   - Document pipeline input requirements
 
 - **Output Objects:**
-
   - Return rich objects, not formatted text
   - Use PSCustomObject for structured data
   - Avoid Write-Host for data output
   - Enable downstream cmdlet processing
 
 - **Pipeline Streaming:**
-
   - Output one object at a time
   - Use process block for streaming
   - Avoid collecting large arrays
@@ -192,14 +181,12 @@ function Update-ResourceStatus {
 ## Error Handling and Safety
 
 - **ShouldProcess Implementation:**
-
   - Use `[CmdletBinding(SupportsShouldProcess = $true)]`
   - Set appropriate `ConfirmImpact` level
   - Call `$PSCmdlet.ShouldProcess()` for system changes
   - Use `ShouldContinue()` for additional confirmations
 
 - **Message Streams:**
-
   - `Write-Verbose` for operational details with `-Verbose`
   - `Write-Warning` for warning conditions
   - `Write-Error` for non-terminating errors
@@ -207,7 +194,6 @@ function Update-ResourceStatus {
   - Avoid `Write-Host` except for user interface text
 
 - **Error Handling Pattern:**
-
   - Use try/catch blocks for error management
   - Set appropriate ErrorAction preferences
   - Return meaningful error messages
@@ -292,8 +278,8 @@ function Remove-UserAccount {
 
 ## Documentation and Style
 
-- **Comment-Based Help:** Include comment-based help for any public-facing function or cmdlet. Inside the function, add a `<# ... #>` help comment with at least:
-
+- **Comment-Based Help:** Include comment-based help for any public-facing function or cmdlet.
+  Inside the function, add a `<# ... #>` help comment with at least:
   - `.SYNOPSIS` Brief description
   - `.DESCRIPTION` Detailed explanation
   - `.EXAMPLE` sections with practical usage
@@ -302,7 +288,6 @@ function Remove-UserAccount {
   - `.NOTES` Additional information
 
 - **Consistent Formatting:**
-
   - Follow consistent PowerShell style
   - Use proper indentation (4 spaces recommended)
   - Opening braces on same line as statement
@@ -312,14 +297,14 @@ function Remove-UserAccount {
   - Avoid unnecessary whitespace
 
 - **Pipeline Support:**
-
   - Implement Begin/Process/End blocks for pipeline functions
   - Use ValueFromPipeline where appropriate
   - Support pipeline input by property name
   - Return proper objects, not formatted text
 
 - **Avoid Aliases:** Use full cmdlet names and parameters
-  - Avoid using aliases in scripts (e.g., use Get-ChildItem instead of gci); aliases are acceptable for interactive shell use.
+  - Avoid using aliases in scripts (e.g., use `Get-ChildItem` instead of `gci`);
+    aliases are acceptable for interactive shell use.
   - Use `Where-Object` instead of `?` or `where`
   - Use `ForEach-Object` instead of `%`
   - Use `Get-ChildItem` instead of `ls` or `dir`
@@ -371,5 +356,3 @@ function New-Resource {
     }
 }
 ```
-
-å
