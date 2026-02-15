@@ -91,7 +91,7 @@ function validateDevcontainer() {
 
   if (!existsSync(devcontainerPath)) {
     errors.push("❌ .devcontainer/devcontainer.json not found");
-    return;
+    return [];
   }
 
   console.log("📋 Checking devcontainer.json...");
@@ -186,7 +186,7 @@ function validateExtensions() {
  * Cross-check devcontainer extensions with extensions.json
  */
 function crossCheckExtensions(devcontainerExts, extensionsJsonExts) {
-  if (devcontainerExts.length === 0 || extensionsJsonExts.length === 0) {
+  if (!devcontainerExts || !extensionsJsonExts || devcontainerExts.length === 0 || extensionsJsonExts.length === 0) {
     return;
   }
 
