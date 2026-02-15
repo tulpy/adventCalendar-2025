@@ -1,19 +1,14 @@
 ---
 name: bicep-review-subagent
-description: >
-  Bicep code review subagent. Reviews Bicep templates against Azure Verified Modules (AVM)
-  standards, naming conventions, security baseline, and best practices. Returns structured
-  APPROVED/NEEDS_REVISION/FAILED verdict with actionable feedback.
+description: "Bicep code review subagent. Reviews Bicep templates against Azure Verified Modules (AVM) standards, naming conventions, security baseline, and best practices. Returns structured APPROVED/NEEDS_REVISION/FAILED verdict with actionable feedback."
 model: "GPT-5.3-Codex (copilot)"
 user-invokable: false
 disable-model-invocation: false
 agents: []
 tools:
-  [
-    "read",
-    "search",
-    "web",
-  ]
+  - read
+  - search
+  - web
 ---
 
 # Bicep Review Subagent
