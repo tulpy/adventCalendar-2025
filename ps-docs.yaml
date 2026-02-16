@@ -1,0 +1,7 @@
+configuration:
+  AZURE_USE_PARAMETER_FILE_SNIPPET: false
+  AZURE_USE_COMMAND_LINE_SNIPPET: true
+
+output:
+  culture:
+    - "en-AU"

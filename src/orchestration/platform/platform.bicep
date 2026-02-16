@@ -74,7 +74,7 @@ var managementGroupRoleAssignments = [
 ]
 
 @description('Module: Int Root Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module intRoot 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module intRoot 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('intRoot-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -95,7 +95,7 @@ module intRoot 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Decommissioned Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module decommissioned 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module decommissioned 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('decommissioned-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -109,7 +109,7 @@ module decommissioned 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Sandbox Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module sandbox 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module sandbox 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('sandbox-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -123,7 +123,7 @@ module sandbox 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Platform Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module platform 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module platform 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('platform-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -137,7 +137,7 @@ module platform 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Platform Management Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module platformManagement 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module platformManagement 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('platformManagement-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -151,7 +151,7 @@ module platformManagement 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Platform Identity Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module platformIdentity 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module platformIdentity 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('platformIdentity-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -165,7 +165,7 @@ module platformIdentity 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Platform Connectivity Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module platformConnectivity 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module platformConnectivity 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('platformConnectivity-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -179,7 +179,7 @@ module platformConnectivity 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Platform Security Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module platformSecurity 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module platformSecurity 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('platformSecurity-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -193,7 +193,7 @@ module platformSecurity 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Landing Zone Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module landingZones 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module landingZones 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('landingZones-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -207,7 +207,7 @@ module landingZones 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Landing Zone Corp Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module lzCorp 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module lzCorp 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('corp-${guid(deployment().name)}', 64)
   params: {
     // Required parameters
@@ -221,7 +221,7 @@ module lzCorp 'br/public:avm/ptn/alz/empty:0.3.5' = {
 }
 
 @description('Module: Landing Zone Online Management Group - https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/alz/empty')
-module lzOnline 'br/public:avm/ptn/alz/empty:0.3.5' = {
+module lzOnline 'br/public:avm/ptn/alz/empty:0.3.6' = {
   name: take('online-${guid(deployment().name)}', 64)
   params: {
     // Required parameters

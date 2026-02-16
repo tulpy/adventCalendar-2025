@@ -21,13 +21,30 @@ on:
       location:
         required: true
         type: string
-      management-group-id:
+      managementGroupId:
         required: false
         type: string
-      stackType:
+      subscriptionId:
         required: false
         type: string
-        default: 'deployment'
+      resourceGroupName:
+        required: false
+        type: string
+      type:
+        required: true
+        type: string
+      description:
+        required: false
+        type: string
+      actionOnUnmanageManagementgroup:
+        required: false
+        type: string
+      actionOnUnmanageResources:
+        required: false
+        type: string
+      denySettingsMode:
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -58,7 +75,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          #auth-type: 'IDENTITY' # Assuming Managed Identity for GitHub Actions, you'll need to document this
           allow-no-subscriptions: true
           enable-AzPSSession: true
 
@@ -73,20 +89,46 @@ jobs:
           echo "templateFile=${{ steps.read-yaml.outputs[format('{0}.templateFile', inputs.configKey)] }}" >> $GITHUB_ENV
           echo "templateParameterFile=${{ steps.read-yaml.outputs[format('{0}.templateParameterFile', inputs.configKey)] }}" >> $GITHUB_ENV
 
-      - name: Bicep Action
+      - name: Bicep Action - Subscription Scope
+        if: ${{ inputs.deploymentLevel == 'subscription' }}
         uses: azure/bicep-deploy@v2
-        id: bicep
+        id: bicepSub
         with:
           operation: ${{ inputs.deploymentType }}
-          type: ${{ inputs.stackType }}
+          type: ${{ inputs.type }}
           name: ${{ env.deploymentJobId }}
           location: ${{ inputs.location }}
-          scope: ${{ inputs.deploymentLevel }}
-          management-group-id: ${{ inputs.management-group-id }}
+          scope: 'subscription'
+          subscription-id: ${{ inputs.subscriptionId }}
           template-file: ${{ env.templateFile }}
           parameters-file: ${{ env.templateParameterFile }}
           what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
           validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
+          action-on-unmanage-resourcegroups: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageManagementgroup || '' }}
+          action-on-unmanage-resources: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageResources || '' }}
+          deny-settings-mode: ${{ inputs.type == 'deploymentStacks' && inputs.denySettingsMode || '' }}
+          description: ${{ inputs.type == 'deploymentStacks' && inputs.description || '' }}
+
+
+      - name: Bicep Action - Management Group Scope
+        if: ${{ inputs.deploymentLevel == 'managementGroup' }}
+        uses: azure/bicep-deploy@v2
+        id: bicepMg
+        with:
+          operation: ${{ inputs.deploymentType }}
+          type: ${{ inputs.type }}
+          name: ${{ env.deploymentJobId }}
+          location: ${{ inputs.location }}
+          scope: 'managementGroup'
+          management-group-id: ${{ inputs.managementGroupId }}
+          template-file: ${{ env.templateFile }}
+          parameters-file: ${{ env.templateParameterFile }}
+          what-if-exclude-change-types: ${{ inputs.deploymentType == 'whatIf' && 'noChange,ignore,unsupported' || '' }}
+          validation-level: ${{ inputs.deploymentType == 'whatIf' && 'providerNoRbac' || '' }}
+          action-on-unmanage-managementgroup: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageManagementgroup || '' }}
+          action-on-unmanage-resources: ${{ inputs.type == 'deploymentStacks' && inputs.actionOnUnmanageResources || '' }}
+          deny-settings-mode: ${{ inputs.type == 'deploymentStacks' && inputs.denySettingsMode || '' }}
+          description: ${{ inputs.type == 'deploymentStacks' && inputs.description || '' }}
 
       - name: Azure Cost CLI Summary
         if: ${{ inputs.deploymentType == 'create' }} # Only run on create deployments as they're the only ones that incur cost
