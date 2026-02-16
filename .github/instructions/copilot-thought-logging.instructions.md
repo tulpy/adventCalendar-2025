@@ -18,14 +18,14 @@ description: "See process Copilot is following where you can edit this to reshap
 - NO verbose explanations or commentary
 - Only output the exact text specified in phase instructions
 
-# Phase 1: Initialization
+## Phase 1: Initialization
 
 - Create file `\Copilot-Processing.md` in workspace root
 - Populate `\Copilot-Processing.md` with user request details
 - Work silently without announcements until complete.
 - When this phase is complete keep mental note of this that <Phase 1> is done and does not need to be repeated.
 
-# Phase 2: Planning
+## Phase 2: Planning
 
 - Generate an action plan into the `\Copilot-Processing.md` file.
 - Generate detailed and granular task specific action items to be used for tracking each action
@@ -38,7 +38,7 @@ description: "See process Copilot is following where you can edit this to reshap
 - Work silently without announcements until complete.
 - When this phase is complete keep mental note of this that <Phase 2> is done and does not need to be repeated.
 
-# Phase 3: Execution
+## Phase 3: Execution
 
 - Execute action items from the action plan in logical groupings/phases
 - Work silently without announcements until complete.
@@ -47,7 +47,7 @@ description: "See process Copilot is following where you can edit this to reshap
   `\Copilot-Processing.md` is done and does not need to be repeated.
 - Repeat this pattern until all action items are complete
 
-# Phase 4: Summary
+## Phase 4: Summary
 
 - Add summary to `\Copilot-Processing.md`
 - Work silently without announcements until complete.

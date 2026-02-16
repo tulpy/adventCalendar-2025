@@ -255,11 +255,13 @@ create_process_flow("Document Flow", "document-flow")
 ## Common Process Flow Patterns
 
 ### Pattern 1: Linear Process
+
 ```python
 start >> step1 >> step2 >> step3 >> end
 ```
 
 ### Pattern 2: Decision Branch
+
 ```python
 step >> decision
 decision >> Edge(label="Yes") >> path_a >> end
@@ -267,11 +269,13 @@ decision >> Edge(label="No") >> path_b >> end
 ```
 
 ### Pattern 3: Parallel Processing
+
 ```python
 step >> [parallel_a, parallel_b, parallel_c] >> merge >> next_step
 ```
 
 ### Pattern 4: Loop/Retry
+
 ```python
 process >> decision
 decision >> Edge(label="Success") >> next
@@ -279,6 +283,7 @@ decision >> Edge(label="Retry") >> process
 ```
 
 ### Pattern 5: Swimlanes (Actors)
+
 ```python
 with Cluster("Customer"):
     customer_actions = [Action("Submit"), Action("Review")]
@@ -293,6 +298,7 @@ with Cluster("Admin"):
 ## Styling Guide
 
 ### Node Shapes by Type
+
 - **Start/End**: Ellipse (rounded)
 - **Process/Action**: Rectangle with rounded corners
 - **Decision**: Diamond
@@ -301,6 +307,7 @@ with Cluster("Admin"):
 - **Delay/Wait**: Half-circle
 
 ### Color Coding
+
 ```python
 # Suggested colors
 USER_ACTION = "#E3F2FD"      # Light blue
@@ -333,6 +340,7 @@ When converting ASCII diagrams like:
 ```
 
 Map to:
+
 1. Identify actors/swimlanes (User, System)
 2. Identify decision points (diamonds in ASCII)
 3. Identify process steps (boxes)

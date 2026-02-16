@@ -107,8 +107,8 @@ Verify these are documented (ask user if missing):
 4. **Estimate costs** — Use Azure Pricing MCP for real-time SKU pricing
 5. **Generate assessment** — Save `02-architecture-assessment.md` following template H2s
 6. **Generate cost estimate** — Save `03-des-cost-estimate.md` following template H2s
-8. **Self-validate** — Run `npm run lint:artifact-templates` and fix any errors for your artifacts
-9. **Approval gate** — Present summary, wait for user approval before handoff
+7. **Self-validate** — Run `npm run lint:artifact-templates` and fix any errors for your artifacts
+8. **Approval gate** — Present summary, wait for user approval before handoff
 
 ## Cost Estimation (MANDATORY)
 

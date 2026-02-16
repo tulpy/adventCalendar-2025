@@ -386,7 +386,7 @@ Required bullets:
 - Data/egress assumptions
 - Prices queried date
 
-### 19. 📊 Pricing Data Accuracy
+### Example Output
 
 ```markdown
 ## 📊 Pricing Data Accuracy

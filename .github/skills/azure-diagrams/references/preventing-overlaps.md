@@ -24,6 +24,7 @@ dot.edge('a', 'b', headlabel='Token', taillabel='Request')
 ```
 
 **For sequence-style numbered flows**:
+
 ```python
 # Don't label edges - use intermediate nodes instead
 dot.node('step1', '1. Redirect', shape='plaintext')
@@ -50,6 +51,7 @@ dot.attr(
 ```
 
 **For the diagrams library** (Python diagrams):
+
 ```python
 with Diagram(
     "Title",
@@ -136,6 +138,7 @@ graph_attr = {"splines": "spline", "overlap": "false"}
 ```
 
 **Note**: With `splines="ortho"`, edge labels may not render. Use `xlabel` instead of `label`:
+
 ```python
 # With ortho splines, use xlabel
 dot.edge('a', 'b', xlabel='connection')  # Works
@@ -145,6 +148,7 @@ dot.edge('a', 'b', label='connection')   # May not display
 ## Recommended Settings by Diagram Complexity
 
 ### Simple (< 10 nodes)
+
 ```python
 dot.attr(nodesep='0.5', ranksep='0.75')
 ```
@@ -192,11 +196,13 @@ sql = SQLDatabases("Orders\n(S3 tier)")
 ```
 
 ### Medium (10-25 nodes)
+
 ```python
 dot.attr(nodesep='0.8', ranksep='1.0', pad='0.5')
 ```
 
 ### Complex (25+ nodes) - Like the W2 Architecture
+
 ```python
 dot.attr(
     nodesep='1.2',       # More horizontal space
@@ -212,12 +218,14 @@ dot.attr(
 ### Problem: Database cylinder overlapping adjacent nodes
 
 **Solution 1: Increase node width**
+
 ```python
 dot.node('database', 'W2 Database\nSQL Server 2008 R2', 
          shape='cylinder', width='2.0', height='1.5')
 ```
 
 **Solution 2: Use rank constraints to force positioning**
+
 ```python
 # Force nodes to be on the same horizontal level
 with dot.subgraph() as s:
@@ -233,6 +241,7 @@ with dot.subgraph() as s:
 ```
 
 **Solution 3: Add invisible spacer nodes**
+
 ```python
 dot.node('spacer1', '', style='invis', width='0.5')
 dot.edge('node_before', 'spacer1', style='invis')
@@ -242,6 +251,7 @@ dot.edge('spacer1', 'database', style='invis')
 ### Problem: Edges crossing through nodes
 
 **Solution: Use xlabel instead of label for edge labels**
+
 ```python
 # Instead of:
 dot.edge('a', 'b', label='connection')
@@ -251,6 +261,7 @@ dot.edge('a', 'b', xlabel='connection')
 ```
 
 **Solution: Change spline type**
+
 ```python
 # Try different spline options
 dot.attr(splines='spline')    # Curved - usually best
@@ -261,6 +272,7 @@ dot.attr(splines='curved')    # Similar to spline
 ### Problem: Clusters overlapping
 
 **Solution: Add margin inside clusters**
+
 ```python
 with dot.subgraph(name='cluster_0') as c:
     c.attr(

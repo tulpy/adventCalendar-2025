@@ -158,7 +158,7 @@ gantt
 ```
 
 > Replace with actual maintenance schedule.
-
+>
 > [!TIP]
 > 💡 Schedule maintenance during low-traffic periods. Use Azure Update Manager for coordinated patching.
 

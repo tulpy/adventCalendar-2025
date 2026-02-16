@@ -194,12 +194,14 @@ done
 When analyzing `policyRule.if` conditions, extract:
 
 1. **Resource Types Affected**:
+
    ```json
    "field": "type",
    "equals": "Microsoft.Storage/storageAccounts"  // Only affects Storage Accounts
    ```
 
 2. **Conditional Logic**:
+
    ```json
    "allOf": [  // ALL conditions must be true
      {"field": "type", "equals": "Microsoft.ClassicCompute/virtualMachines"},
@@ -209,6 +211,7 @@ When analyzing `policyRule.if` conditions, extract:
    ```
 
 3. **Configuration Checks**:
+
    ```json
    "field": "Microsoft.Storage/storageAccounts/allowBlobPublicAccess",
    "equals": "true"  // Denies if public access is enabled

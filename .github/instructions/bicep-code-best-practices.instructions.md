@@ -114,7 +114,7 @@ module keyVault 'br/public:avm/res/key-vault/vault:0.11.0' = {
 
 ### AVM Approval Workflow
 
-1. **Check AVM availability**: Use `mcp_bicep_list_avm_metadata` or https://aka.ms/avm/index
+1. **Check AVM availability**: Use `mcp_bicep_list_avm_metadata` or <https://aka.ms/avm/index>
 2. **If AVM exists**: Use `br/public:avm/res/{service}/{resource}:{version}`
 3. **If no AVM**: STOP and ask user: "No AVM module found for {resource}. Type **approve raw bicep** to proceed."
 4. **If approved**: Document justification in implementation reference

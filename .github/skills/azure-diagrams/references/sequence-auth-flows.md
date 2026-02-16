@@ -5,6 +5,7 @@ Guide for creating clean authentication flows, sequence diagrams, and numbered s
 ## The Problem with Numbered Edge Labels
 
 When you have a flow like:
+
 1. Redirect → 2. Login → 3. Token → 4. Access → 5. Validate
 
 Graphviz often struggles to place numbered labels correctly, resulting in floating labels.

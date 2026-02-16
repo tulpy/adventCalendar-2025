@@ -29,18 +29,21 @@ When performing a code review, respond in **English**.
 When performing a code review, prioritize issues in the following order:
 
 ### 🔴 CRITICAL (Block merge)
+
 - **Security**: Vulnerabilities, exposed secrets, authentication/authorization issues
 - **Correctness**: Logic errors, data corruption risks, race conditions
 - **Breaking Changes**: API contract changes without versioning
 - **Data Loss**: Risk of data loss or corruption
 
 ### 🟡 IMPORTANT (Requires discussion)
+
 - **Code Quality**: Severe violations of SOLID principles, excessive duplication
 - **Test Coverage**: Missing tests for critical paths or new functionality
 - **Performance**: Obvious performance bottlenecks (N+1 queries, memory leaks)
 - **Architecture**: Significant deviations from established patterns
 
 ### 🟢 SUGGESTION (Non-blocking improvements)
+
 - **Readability**: Poor naming, complex logic that could be simplified
 - **Optimization**: Performance improvements without functional impact
 - **Best Practices**: Minor deviations from conventions
@@ -63,6 +66,7 @@ When performing a code review, follow these principles:
 When performing a code review, check for:
 
 ### Clean Code
+
 - Descriptive and meaningful names for variables, functions, and classes
 - Single Responsibility Principle: each function/class does one thing well
 - DRY (Don't Repeat Yourself): no code duplication
@@ -71,7 +75,8 @@ When performing a code review, check for:
 - Avoid magic numbers and strings (use constants)
 - Code should be self-documenting; comments only when necessary
 
-### Examples
+### Clean Code Examples
+
 ```javascript
 // ❌ BAD: Poor naming and magic numbers
 function calc(x, y) {
@@ -92,13 +97,15 @@ function calculateDiscount(orderTotal, itemPrice) {
 ```
 
 ### Error Handling
+
 - Proper error handling at appropriate levels
 - Meaningful error messages
 - No silent failures or ignored exceptions
 - Fail fast: validate inputs early
 - Use appropriate error types/exceptions
 
-### Examples
+### Error Handling Examples
+
 ```python
 # ❌ BAD: Silent failure and generic error
 def process_user(user_id):
@@ -136,6 +143,7 @@ When performing a code review, check for security issues:
 - **Dependency Security**: Check for known vulnerabilities in dependencies
 
 ### Examples
+
 ```java
 // ❌ BAD: SQL injection vulnerability
 String query = "SELECT * FROM users WHERE email = '" + email + "'";
@@ -168,6 +176,7 @@ When performing a code review, verify test quality:
 - **Mock Appropriately**: Mock external dependencies, not domain logic
 
 ### Examples
+
 ```typescript
 // ❌ BAD: Vague name and assertion
 test('test1', () => {
@@ -198,6 +207,7 @@ When performing a code review, check for performance issues:
 - **Lazy Loading**: Load data only when needed
 
 ### Examples
+
 ```python
 # ❌ BAD: N+1 query problem
 users = User.query.all()
@@ -252,6 +262,7 @@ Explanation of the impact or reason for the suggestion.
 ### Example Comments
 
 #### Critical Issue
+
 ````markdown
 **🔴 CRITICAL - Security: SQL Injection Vulnerability**
 
@@ -278,6 +289,7 @@ stmt.setString(1, email);
 ````
 
 #### Important Issue
+
 ````markdown
 **🟡 IMPORTANT - Testing: Missing test coverage for critical path**
 
@@ -303,6 +315,7 @@ test('should process full refund when order is cancelled', () => {
 ````
 
 #### Suggestion
+
 ````markdown
 **🟢 SUGGESTION - Readability: Simplify nested conditionals**
 
@@ -335,6 +348,7 @@ if (!user || !user.isActive || !user.hasPermission('write')) {
 When performing a code review, systematically verify:
 
 ### Code Quality
+
 - [ ] Code follows consistent style and conventions
 - [ ] Names are descriptive and follow naming conventions
 - [ ] Functions/methods are small and focused
@@ -344,6 +358,7 @@ When performing a code review, systematically verify:
 - [ ] No commented-out code or TODO without tickets
 
 ### Security
+
 - [ ] No sensitive data in code or logs
 - [ ] Input validation on all user inputs
 - [ ] No SQL injection vulnerabilities
@@ -351,6 +366,7 @@ When performing a code review, systematically verify:
 - [ ] Dependencies are up-to-date and secure
 
 ### Testing
+
 - [ ] New code has appropriate test coverage
 - [ ] Tests are well-named and focused
 - [ ] Tests cover edge cases and error scenarios
@@ -358,18 +374,21 @@ When performing a code review, systematically verify:
 - [ ] No tests that always pass or are commented out
 
 ### Performance
+
 - [ ] No obvious performance issues (N+1, memory leaks)
 - [ ] Appropriate use of caching
 - [ ] Efficient algorithms and data structures
 - [ ] Proper resource cleanup
 
 ### Architecture
+
 - [ ] Follows established patterns and conventions
 - [ ] Proper separation of concerns
 - [ ] No architectural violations
 - [ ] Dependencies flow in correct direction
 
 ### Documentation
+
 - [ ] Public APIs are documented
 - [ ] Complex logic has explanatory comments
 - [ ] README is updated if needed

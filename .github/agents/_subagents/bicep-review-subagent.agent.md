@@ -72,6 +72,7 @@ Recommendation: {specific next action}
 | Parameters match AVM spec | HIGH | Verify required params are provided |
 
 **AVM Reference Versions**:
+
 - Key Vault: `br/public:avm/res/key-vault/vault:0.11.0`
 - Virtual Network: `br/public:avm/res/network/virtual-network:0.5.0`
 - Storage Account: `br/public:avm/res/storage/storage-account:0.14.0`

@@ -25,6 +25,7 @@ from diagrams.azure.monitor import Monitor, ApplicationInsights, LogAnalyticsWor
 ## AI & Machine Learning (42 components)
 
 ### diagrams.azure.aimachinelearning
+
 ```python
 from diagrams.azure.aimachinelearning import (
     AIStudio, AnomalyDetector, AzureAppliedAIServices, AzureOpenai,
@@ -36,6 +37,7 @@ from diagrams.azure.aimachinelearning import (
 ```
 
 ### diagrams.azure.ml
+
 ```python
 from diagrams.azure.ml import (
     AzureOpenAI, AzureSpeechService, BatchAI, BotServices,
@@ -104,6 +106,7 @@ from diagrams.azure.containers import (
 ## Database (51 components)
 
 ### diagrams.azure.database
+
 ```python
 from diagrams.azure.database import (
     CosmosDb, SQL, SQLDatabases, SQLServers, SQLManagedInstances,
@@ -114,6 +117,7 @@ from diagrams.azure.database import (
 ```
 
 ### diagrams.azure.databases
+
 ```python
 from diagrams.azure.databases import (
     AzureCosmosDb, AzureSQL, AzureSQLVM, AzureSynapseAnalytics,
@@ -266,6 +270,7 @@ from diagrams.azure.monitor import (
 ## Networking (79 components)
 
 ### diagrams.azure.network
+
 ```python
 from diagrams.azure.network import (
     # Gateways & Load Balancing
@@ -296,6 +301,7 @@ from diagrams.azure.network import (
 ```
 
 ### diagrams.azure.networking (extended)
+
 ```python
 from diagrams.azure.networking import (
     # Additional components
@@ -456,6 +462,7 @@ from diagrams.azure.general import (
 ## Special Categories
 
 ### Blockchain
+
 ```python
 from diagrams.azure.blockchain import (
     AzureBlockchainService, BlockchainApplications, Consortium
@@ -463,6 +470,7 @@ from diagrams.azure.blockchain import (
 ```
 
 ### Mixed Reality
+
 ```python
 from diagrams.azure.mixedreality import (
     RemoteRendering, SpatialAnchorAccounts
@@ -470,6 +478,7 @@ from diagrams.azure.mixedreality import (
 ```
 
 ### Azure Stack
+
 ```python
 from diagrams.azure.azurestack import (
     Capacity, InfrastructureBackup, MultiTenancy, Offers,
@@ -478,6 +487,7 @@ from diagrams.azure.azurestack import (
 ```
 
 ### Intune
+
 ```python
 from diagrams.azure.intune import (
     Intune, IntuneAppProtection, Devices, DeviceCompliance,
@@ -490,7 +500,9 @@ from diagrams.azure.intune import (
 ## Finding the Right Component
 
 ### By Service Name
+
 If you know the Azure service name, look in the relevant category:
+
 - **App Service** → `compute` or `web`
 - **Azure SQL** → `database` or `databases`
 - **Cosmos DB** → `database`
@@ -502,13 +514,17 @@ If you know the Azure service name, look in the relevant category:
 - **Event Hubs** → `analytics` or `iot`
 
 ### Duplicate Components
+
 Some services appear in multiple modules. Generally:
+
 - Use the **most specific** module for your diagram type
 - `database` vs `databases` - both work, choose by personal preference
 - `network` vs `networking` - `networking` has more modern components
 
 ### Missing Components
+
 If a component isn't available:
+
 1. Use `diagrams.azure.general` for generic icons
 2. Use a related service icon
 3. Create a custom node with `diagrams.custom.Custom`
@@ -518,6 +534,7 @@ If a component isn't available:
 ## Best Practices
 
 ### Importing
+
 ```python
 # Good - import what you need
 from diagrams.azure.compute import FunctionApps, AKS
@@ -528,6 +545,7 @@ from diagrams.azure import compute  # harder to read
 ```
 
 ### Naming Consistency
+
 ```python
 # Use descriptive variable names
 with Diagram("Architecture"):
@@ -537,6 +555,7 @@ with Diagram("Architecture"):
 ```
 
 ### Grouping Related Services
+
 ```python
 with Cluster("Data Tier"):
     cosmos = CosmosDb("Primary")

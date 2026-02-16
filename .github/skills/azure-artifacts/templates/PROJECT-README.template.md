@@ -1,4 +1,4 @@
-# Project README Template
+## Project README Template
 
 > **Template for project-level README files in `agent-output/{project}/`**
 
@@ -46,7 +46,7 @@ When generating a project README, agents MUST:
 
 **{project-description}**
 
-[View Architecture](#-architecture) · [View Artifacts](#-generated-artifacts) · [View Progress](#-workflow-progress)
+[View Architecture](#️-architecture) · [View Artifacts](#-generated-artifacts) · [View Progress](#-workflow-progress)
 
 </div>
 

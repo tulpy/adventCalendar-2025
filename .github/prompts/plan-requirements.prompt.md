@@ -129,4 +129,5 @@ After requirements are captured and approved:
 1. User invokes the **Architect** agent for architecture assessment
 2. Architect agent validates requirements and produces WAF assessment
 3. Workflow continues through remaining 5 steps
+
 ---

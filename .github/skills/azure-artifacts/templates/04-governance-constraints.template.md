@@ -69,6 +69,7 @@ Verify actual blocking behavior before documenting constraints.
 | Enforce storage encryption | Subscription | DeployIfNotExists | Nothing (auto-remediates) | Adds encryption config automatically |
 
 **Analysis Notes**:
+
 - Document any policies initially flagged as blockers but cleared after JSON analysis
 - List conditional logic (tag requirements, resource type filters, configuration checks)
 - Note deployment modifications from Modify/DeployIfNotExists policies
@@ -145,7 +146,7 @@ Verify actual blocking behavior before documenting constraints.
    - **Duration**: {temporary / permanent}
    - **Risk Level**: {low / medium / high}
    - **Approval Process**: {steps}
-   
+
 2. **Alternative Architecture**:
    - {Description of compliant alternative}
    - **Trade-offs**: {performance / cost / complexity impacts}
@@ -153,6 +154,7 @@ Verify actual blocking behavior before documenting constraints.
 **Status**: ⚠️ **DEPLOYMENT CANNOT PROCEED WITHOUT RESOLUTION**
 
 **Next Steps**:
+
 - [ ] User confirms exemption approval
 - [ ] OR User approves alternative architecture
 - [ ] OR User provides timeline for exemption

@@ -72,6 +72,7 @@ for troubleshooting existing deployments.
 ### Phase 1: Resource Discovery
 
 Ask user to identify the target:
+
 - Specific resource, resource group, or resource type across subscription
 - Use Azure Resource Graph for discovery (preferred over `az resource list`)
 
@@ -133,9 +134,11 @@ For EACH remediation action, present:
 
 > ⚠️ **Remediation Action Approval**
 > **Issue**: {description}  |  **Action**: {fix}  |  **Risk**: {side effects}  |  **Rollback**: {undo}
+>
 > ```bash
 > {command}
 > ```
+>
 > 👉 **Execute?** (y/n/skip)
 
 Common actions: scale up/out, restart, config changes, enable diagnostics.

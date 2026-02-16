@@ -514,6 +514,7 @@ create_svg_wireframe("Dashboard", 800, 600, "dashboard-svg")
 ## Converting ASCII Wireframes
 
 When you see ASCII mockups like:
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │  Document Management System          [Home] [Docs] [⚙️]   │
@@ -535,6 +536,7 @@ When you see ASCII mockups like:
 ```
 
 Extract:
+
 1. **Header** - Title, navigation items
 2. **Sidebar** - Menu items, active state
 3. **Main content** - Cards, stats, tables

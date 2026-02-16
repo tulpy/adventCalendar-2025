@@ -142,7 +142,7 @@ Example configuration snippet
 
 **Approval Gate**: Verify security controls before CDE resources.
 
-### Phase N: ...
+### Phase N
 
 _(Repeat for each phase)_
 

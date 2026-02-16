@@ -376,6 +376,7 @@ create_parallel_tracks(tracks, "dev-migration-timeline")
 ## Converting ASCII Timelines
 
 When you see:
+
 ```
 Q1 2025          Q2 2025          Q3 2025          Q4 2025
 |                |                |                |
@@ -386,6 +387,7 @@ Q1 2025          Q2 2025          Q3 2025          Q4 2025
 ```
 
 Extract:
+
 1. Time periods (quarters, months, weeks)
 2. Phase/task names
 3. Duration (spans between markers)

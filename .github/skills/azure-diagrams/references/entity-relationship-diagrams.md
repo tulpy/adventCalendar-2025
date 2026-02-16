@@ -159,6 +159,7 @@ relationships = """
 ## Relationship Notation
 
 ### Crow's Foot Notation
+
 ```
 ||--||  One to One
 ||--o{  One to Many (optional)
@@ -167,6 +168,7 @@ relationships = """
 ```
 
 ### In Graphviz
+
 ```python
 # One to Many
 dot.edge('Parent', 'Child', arrowhead='crow', arrowtail='tee')
@@ -314,6 +316,7 @@ create_access_matrix()
 ## Converting ASCII ERDs
 
 When you see ASCII like:
+
 ```
 ┌─────────────┐       ┌─────────────┐
 │  Documents  │       │  Accounts   │
@@ -325,6 +328,7 @@ When you see ASCII like:
 ```
 
 Extract:
+
 1. Table names (headers)
 2. Column names (rows in boxes)
 3. Relationships (arrows between boxes)

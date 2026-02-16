@@ -395,19 +395,23 @@ with Diagram("Hybrid Cloud", show=False, direction="LR"):
 ## Tips for Professional Diagrams
 
 ### Consistent Direction
+
 - `direction="TB"` (top-bottom) for hierarchical architectures
 - `direction="LR"` (left-right) for flow/pipeline diagrams
 
 ### Meaningful Clustering
+
 - Group by: Resource Group, Subnet, Service tier, or Logical function
 - Avoid too many nested clusters (max 2-3 levels)
 
 ### Edge Styling
+
 - Solid lines: Primary data flow
 - Dashed lines: Configuration, secrets, replication
 - Colored lines: Highlight critical paths
 
 ### Labels
+
 - Keep node labels short (1-3 words)
 - Add context in cluster names
 - Use edge labels sparingly
